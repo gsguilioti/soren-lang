@@ -1,0 +1,17 @@
+expr       -> term expr'
+
+expr'      -> + term expr' 
+            | - term expr' 
+            | &
+
+term       ->   unary term' 
+
+term'_     -> * unary term' 
+            | / unary term' 
+            | &
+
+unary      -> - factor 
+            | factor
+
+factor     -> ( expr ) 
+            | [0-9]

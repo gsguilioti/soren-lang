@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "token.h"
 #include "lexer.h"
 
 char* read_file(char* filename)
@@ -38,6 +39,20 @@ char* read_file(char* filename)
     return content;
 }
 
+void print_tokens(struct token_list* list)
+{
+    if(list->head == NULL)
+        return;
+
+    struct token_node* aux = list->head;
+    while(aux->next != NULL)
+    {
+        printf("Token: [%d, %s, %d]\n", aux->token->type, aux->token->lexeme, aux->token->line);
+        aux = aux->next;
+    }
+    printf("Token: [%d, %s, %d]\n", aux->token->type, aux->token->lexeme, aux->token->line);
+}
+
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
@@ -53,7 +68,8 @@ int main(int argc, char* argv[])
 
     struct lexer* lexer = lexer_init(content);
 
-    struct token* token = lexer_read(lexer);
+    struct token_list* list = token_list_init();
+    print_tokens(lexer_read(lexer));
 
     return 0;
 }

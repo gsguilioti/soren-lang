@@ -13,6 +13,7 @@ struct lexer* lexer_init(char* content)
     lexer->line = 0;
     lexer->current = content[lexer->pos];
     lexer->content = content;
+    lexer->tokens = token_list_init();
     return lexer;
 }
 
@@ -35,25 +36,30 @@ void lexer_skip(struct lexer* lexer)
     }
 }
 
-struct token* lexer_read(struct lexer* lexer)
+struct token_list* lexer_read(struct lexer* lexer)
 {
     while(lexer->current != EOF && lexer->pos < strlen(lexer->content))
+        token_list_add(lexer->tokens, lexer_collect(lexer));
+
+    return lexer->tokens;
+}
+
+struct token* lexer_collect(struct lexer* lexer)
+{
+    if(isspace(lexer->current))
+        lexer_skip(lexer);
+
+    if(isdigit(lexer->current))
+        return lexer_num(lexer);
+
+    switch(lexer->current)
     {
-        if(isspace(lexer->current))
-            lexer_skip(lexer);
-
-        if(isdigit(lexer->current))
-            return lexer_num(lexer);
-
-        switch(lexer->current)
-        {
-            case '+': return lexer_op(lexer, TOKEN_PLUS, lexer_tostring_char(lexer));
-            case '-': return lexer_handle_minus(lexer);
-            case '*': return lexer_op(lexer, TOKEN_TIMES, lexer_tostring_char(lexer));
-            case '/': return lexer_op(lexer, TOKEN_DIV,   lexer_tostring_char(lexer));
-            case '(': return lexer_op(lexer, TOKEN_LPAREN, lexer_tostring_char(lexer));
-            case ')': return lexer_op(lexer, TOKEN_RPAREN, lexer_tostring_char(lexer));
-        }
+        case '+': return lexer_op(lexer, TOKEN_PLUS, lexer_tostring_char(lexer));
+        case '-': return lexer_handle_minus(lexer);
+        case '*': return lexer_op(lexer, TOKEN_TIMES, lexer_tostring_char(lexer));
+        case '/': return lexer_op(lexer, TOKEN_DIV,   lexer_tostring_char(lexer));
+        case '(': return lexer_op(lexer, TOKEN_LPAREN, lexer_tostring_char(lexer));
+        case ')': return lexer_op(lexer, TOKEN_RPAREN, lexer_tostring_char(lexer));
     }
 
     return NULL;
@@ -61,7 +67,7 @@ struct token* lexer_read(struct lexer* lexer)
 
 struct token* lexer_op(struct lexer* lexer, int type, char* op)
 {
-    struct token* token = token_create(TOKEN_NUM, op);
+    struct token* token = token_create(type, op, lexer->line);
     lexer_advance(lexer);
     return token;
 }
@@ -82,15 +88,15 @@ struct token* lexer_num(struct lexer* lexer)
         lexer_advance(lexer);
     }
 
-    return token_create(TOKEN_NUM, num);
+    return token_create(TOKEN_NUM, num, lexer->line);
 }
 
 struct token* lexer_handle_minus(struct lexer* lexer)
 {
-    if(lexer->pos > 0 && ispunct(lexer->content[lexer->pos-1]))
-        return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));
+    if(isdigit(lexer->content[lexer->pos+1]))
+        return lexer_num(lexer);
 
-    return lexer_num(lexer);
+    return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));
 }
 
 char* lexer_tostring_char(struct lexer* lexer)

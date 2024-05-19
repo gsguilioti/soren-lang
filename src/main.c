@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "lexer.h"
+
 char* read_file(char* filename)
 {
     FILE* file = fopen(filename, "r");
@@ -48,7 +50,10 @@ int main(int argc, char* argv[])
     strcat(filename, argv[1]);
     
     char* content = read_file(filename);
-    printf("%s\n", content);
+
+    struct lexer* lexer = lexer_init(content);
+
+    struct token* token = lexer_read(lexer);
 
     return 0;
 }

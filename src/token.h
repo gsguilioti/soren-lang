@@ -1,6 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <stdlib.h>
+
 struct token
 {
     enum {
@@ -16,6 +18,6 @@ struct token
     char* lexeme;
 };
 
-struct token token_create(int type, char* lexeme);
+struct token* token_create(int type, char* lexeme);
 
 #endif

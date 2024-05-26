@@ -4,6 +4,7 @@
 
 #include "token.h"
 #include "lexer.h"
+#include "parser.h"
 
 char* read_file(char* filename)
 {
@@ -67,9 +68,10 @@ int main(int argc, char* argv[])
     char* content = read_file(filename);
 
     struct lexer* lexer = lexer_init(content);
-
-    struct token_list* list = token_list_init();
     print_tokens(lexer_read(lexer));
+    
+    struct parser* parser = parser_init(lexer_read(lexer));
+    expr(parser);
 
     return 0;
 }

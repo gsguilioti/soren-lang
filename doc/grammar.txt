@@ -4,14 +4,11 @@ expr'      -> + term expr'
             | - term expr' 
             | &
 
-term       ->   unary term' 
+term       -> factor term' 
 
-term'_     -> * unary term' 
-            | / unary term' 
+term'      -> * factor term' 
+            | / factor term' 
             | &
 
-unary      -> - factor 
-            | factor
-
 factor     -> ( expr ) 
-            | [0-9]
+            | [ - ][0-9]

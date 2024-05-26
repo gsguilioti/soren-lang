@@ -5,12 +5,10 @@ struct lexer* lexer_init(char* content)
     struct lexer* lexer = (struct lexer*)malloc(sizeof(struct lexer));
 
     if(lexer == NULL)
-    {
         exit(EXIT_FAILURE);
-    }
 
     lexer->pos = 0;
-    lexer->line = 0;
+    lexer->line = 1;
     lexer->current = content[lexer->pos];
     lexer->content = content;
     lexer->tokens = token_list_init();

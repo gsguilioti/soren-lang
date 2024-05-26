@@ -100,7 +100,7 @@ struct ast_node* term(struct parser* parser)
 struct ast_node* term_tail(struct parser* parser, struct ast_node* left)
 {
     struct token token = *(peek(parser));
-    if(match(parser, TOKEN_TIMES) || match(parser, TOKEN_DIV))
+    if(match(parser, TOKEN_MULT) || match(parser, TOKEN_DIV))
     {
         struct ast_node* right = factor(parser);
         struct ast_node* binary = ast_binary(BINARY, token, left, right);

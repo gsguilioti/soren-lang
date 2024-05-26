@@ -11,7 +11,8 @@ enum token_type
     TOKEN_PLUS,
     TOKEN_MINUS,
     TOKEN_TIMES,
-    TOKEN_DIV
+    TOKEN_DIV,
+    TOKEN_END
 };
 
 struct token

@@ -41,6 +41,7 @@ struct token_list* lexer_read(struct lexer* lexer)
     while(lexer->current != EOF && lexer->pos < strlen(lexer->content))
         token_list_add(lexer->tokens, lexer_collect(lexer));
 
+    token_list_add(lexer->tokens, token_create(TOKEN_END, "$", lexer->line+1));
     return lexer->tokens;
 }
 

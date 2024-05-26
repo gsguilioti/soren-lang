@@ -72,46 +72,56 @@ struct token* consume(struct parser* parser, int type)
     error(parser);
 }
 
-void expr(struct parser* parser)
+struct ast_node* expr(struct parser* parser)
 {
-    term(parser);
-    expr_tail(parser);
+    struct ast_node* left = term(parser);
+    return expr_tail(parser, left);
 }
 
-void expr_tail(struct parser* parser)
+struct ast_node* expr_tail(struct parser* parser, struct ast_node* left)
 {
+    struct token token = *(peek(parser));
     if(match(parser, TOKEN_PLUS) || match(parser, TOKEN_MINUS))
     {
-        term(parser);
-        expr_tail(parser);
+        struct ast_node* right = term(parser);
+        struct ast_node* binary = ast_binary(BINARY, token, left, right);
+        return expr_tail(parser, binary);
     }
+
+    return left;
 }
 
-void term(struct parser* parser)
+struct ast_node* term(struct parser* parser)
 {
-    factor(parser);
-    term_tail(parser);
+    struct ast_node* left = factor(parser);
+    return term_tail(parser, left);
 }
 
-void term_tail(struct parser* parser)
+struct ast_node* term_tail(struct parser* parser, struct ast_node* left)
 {
+    struct token token = *(peek(parser));
     if(match(parser, TOKEN_TIMES) || match(parser, TOKEN_DIV))
     {
-        factor(parser);
-        term_tail(parser);
+        struct ast_node* right = factor(parser);
+        struct ast_node* binary = ast_binary(BINARY, token, left, right);
+        return term_tail(parser, binary);
     }
+
+    return left;
 }
 
-void factor(struct parser* parser)
+struct ast_node* factor(struct parser* parser)
 {
+    struct token token = *(peek(parser));
     if(match(parser, TOKEN_NUM))
     {
-
+        return ast_primary(NUMBER, token);
     }
     else if(match(parser, TOKEN_LPAREN))
     {
-        expr(parser);
+        struct ast_node* expression = expr(parser);
         consume(parser, TOKEN_RPAREN);
+        return expression;
     }
     else
         error(parser);

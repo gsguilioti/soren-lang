@@ -5,6 +5,7 @@
 #include "token.h"
 #include "lexer.h"
 #include "parser.h"
+#include "ast.h"
 
 char* read_file(char* filename)
 {
@@ -54,6 +55,25 @@ void print_tokens(struct token_list* list)
     printf("Token: [%d, %s, %d]\n", aux->token->type, aux->token->lexeme, aux->token->line);
 }
 
+void print_ast(struct ast_node* node)
+{
+    if (node == NULL) 
+        return;
+    
+    switch (node->type) 
+    {
+        case NUMBER:
+            printf("%s ", node->primary->value.lexeme);
+            break;
+
+        case BINARY:
+            print_ast(node->binary->left);
+            print_ast(node->binary->right);
+            printf("%s ", node->binary->op.lexeme);
+            break;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
@@ -71,7 +91,9 @@ int main(int argc, char* argv[])
     print_tokens(lexer_read(lexer));
     
     struct parser* parser = parser_init(lexer_read(lexer));
-    expr(parser);
+    struct ast_node* ast = expr(parser);
+    print_ast(ast);
+    printf("\n");
 
     return 0;
 }

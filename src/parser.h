@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include "token.h"
+#include "ast.h"
 
 struct parser
 {
@@ -18,11 +19,10 @@ struct token* peek(struct parser* parser);
 struct token* previous(struct parser* parser);
 struct token* consume(struct parser* parser, int type);
 
-void expr(struct parser* parser);
-void expr_tail(struct parser* parser);
-void term(struct parser* parser);
-void term_tail(struct parser* parser);
-void unary(struct parser* parser);
-void factor(struct parser* parser);
+struct ast_node* expr(struct parser* parser);
+struct ast_node* expr_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* term(struct parser* parser);
+struct ast_node* term_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* factor(struct parser* parser);
 
 #endif

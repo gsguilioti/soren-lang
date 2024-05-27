@@ -6,7 +6,8 @@
 
 enum ast_type
 {
-    NUMBER, BINARY
+    BINARY, LOGICAL,
+    LITERAL, VARIABLE, UNARY,
 };
 
 struct ast_node
@@ -15,7 +16,10 @@ struct ast_node
     union
     {
         struct ast_binary* binary;
-        struct ast_primary* primary;
+        struct ast_logical* logical;
+        struct ast_unary* unary;
+        struct ast_literal* literal;
+        struct ast_variable* variable;
     };
 };
 
@@ -26,12 +30,35 @@ struct ast_binary
     struct ast_node* right;     
 };
 
-struct ast_primary
+struct ast_logical
 {
+    struct token op;
+    struct ast_node* left;
+    struct ast_node* right;     
+};
+
+struct ast_unary
+{
+    struct token op;
+    struct ast_node* right;
+};
+
+enum literal_type { INT, BOOL};
+struct ast_literal
+{
+    enum literal_type literal_type;
     struct token value;
 };
 
+struct ast_variable
+{
+    struct token name;
+};
+
 struct ast_node* ast_binary(int type, struct token op, struct ast_node* left, struct ast_node* right);
-struct ast_node* ast_primary(int type, struct token value);
+struct ast_node* ast_logical(int type, struct token op, struct ast_node* left, struct ast_node* right);
+struct ast_node* ast_unary(int type, struct token op, struct ast_node* right);
+struct ast_node* ast_literal(int type, int literal_type, struct token value);
+struct ast_node* ast_variable(int type, struct token value);
 
 #endif

@@ -84,8 +84,8 @@ struct ast_node* bool_tail(struct parser* parser, struct ast_node* left)
     if(match(parser, TOKEN_OR))
     {
         struct ast_node* right = join(parser);
-        struct ast_node* binary = ast_binary(BINARY, *token, left, right);
-        return bool_tail(parser, binary);
+        struct ast_node* logical = ast_logical(LOGICAL, *token, left, right);
+        return bool_tail(parser, logical);
     }
 
     return left;
@@ -103,8 +103,8 @@ struct ast_node* join_tail(struct parser* parser, struct ast_node* left)
     if(match(parser, TOKEN_AND))
     {
         struct ast_node* right = equality(parser);
-        struct ast_node* binary = ast_binary(BINARY, *token, left, right);
-        return join_tail(parser, binary);
+        struct ast_node* logical = ast_logical(LOGICAL, *token, left, right);
+        return join_tail(parser, logical);
     }
 
     return left;
@@ -122,8 +122,8 @@ struct ast_node* equality_tail(struct parser* parser, struct ast_node* left)
     if(match(parser, TOKEN_EQUAL) || match(parser, TOKEN_NOTEQUAL))
     {
         struct ast_node* right = rel(parser);
-        struct ast_node* binary = ast_binary(BINARY, *token, left, right);
-        return equality_tail(parser, binary);
+        struct ast_node* logical = ast_logical(LOGICAL, *token, left, right);
+        return equality_tail(parser, logical);
     }
 
     return left;
@@ -144,8 +144,8 @@ struct ast_node* rel_tail(struct parser* parser, struct ast_node* left)
     || match(parser, TOKEN_LTHEN))
     {
         struct ast_node* right = expr(parser);
-        struct ast_node* binary = ast_binary(BINARY, *token, left, right);
-        return rel_tail(parser, binary);
+        struct ast_node* logical = ast_logical(LOGICAL, *token, left, right);
+        return rel_tail(parser, logical);
     }
 
     return left;
@@ -189,33 +189,29 @@ struct ast_node* term_tail(struct parser* parser, struct ast_node* left)
     return left;
 }
 
+struct ast_node* unary(struct parser* parser)
+{
+    struct token* token = peek(parser);
+    if(match(parser, TOKEN_NOT))
+        return ast_unary(UNARY, *token, factor(parser));
+
+    return factor(parser);
+}
+
 struct ast_node* factor(struct parser* parser)
 {
     struct token* token = peek(parser);
     if(match(parser, TOKEN_NUM))
     {
-        return ast_primary(NUMBER, *token);
+        return ast_literal(LITERAL, INT, *token);
     }
     else if(match(parser, TOKEN_ID))
     {
-        return ast_primary(NUMBER, *token);
+        return ast_variable(VARIABLE, *token);
     }
     else if(match(parser, TOKEN_TRUE) || match(parser, TOKEN_FALSE))
     {
-        return ast_primary(NUMBER, *token);
-    }
-    else if(match(parser, TOKEN_NOT))
-    {
-        struct ast_node* num = factor(parser);
-        int aux = atoi(num->primary->value.lexeme);
-        if(aux)
-        {
-            free(num->primary->value.lexeme);
-            num->primary->value.lexeme = "0";
-            return num;
-        }
-        num->primary->value.lexeme = "1";
-        return num;
+        return ast_literal(LITERAL, BOOL, *token);
     }
     else if(match(parser, TOKEN_LPAREN))
     {

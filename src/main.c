@@ -62,14 +62,25 @@ void print_ast(struct ast_node* node)
     
     switch (node->type) 
     {
-        case NUMBER:
-            printf("%s ", node->primary->value.lexeme);
-            break;
-
         case BINARY:
             print_ast(node->binary->left);
             print_ast(node->binary->right);
             printf("%s ", node->binary->op.lexeme);
+            break;
+        case LOGICAL:
+            print_ast(node->logical->left);
+            print_ast(node->logical->right);
+            printf("%s ", node->logical->op.lexeme);
+            break;
+        case UNARY:
+            print_ast(node->unary->right);
+            printf("%s ", node->unary->op.lexeme);
+            break;
+        case LITERAL:
+            printf("%s ", node->literal->value.lexeme);
+            break;
+        case VARIABLE:
+            printf("%s ", node->variable->name.lexeme);
             break;
     }
 }

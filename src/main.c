@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     print_tokens(lexer_read(lexer));
     
     struct parser* parser = parser_init(lexer_read(lexer));
-    struct ast_node* ast = expr(parser);
+    struct ast_node* ast = bool(parser);
     print_ast(ast);
     printf("\n");
 

@@ -19,6 +19,14 @@ struct token* peek(struct parser* parser);
 struct token* previous(struct parser* parser);
 struct token* consume(struct parser* parser, int type);
 
+struct ast_node* bool(struct parser* parser);
+struct ast_node* bool_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* join(struct parser* parser);
+struct ast_node* join_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* equality(struct parser* parser);
+struct ast_node* equality_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* rel(struct parser* parser);
+struct ast_node* rel_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* expr(struct parser* parser);
 struct ast_node* expr_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* term(struct parser* parser);

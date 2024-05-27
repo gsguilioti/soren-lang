@@ -188,11 +188,7 @@ struct token* lexer_keyword(struct lexer* lexer)
         lexer_advance(lexer);
     }
 
-    if(strcmp(keyword, "and") == 0)
-        return token_create(TOKEN_AND, keyword, lexer->line);
-    else if(strcmp(keyword, "or") == 0)
-        return token_create(TOKEN_OR, keyword, lexer->line);
-    else if(strcmp(keyword, "true") == 0)
+    if(strcmp(keyword, "true") == 0)
         return token_create(TOKEN_TRUE, keyword, lexer->line);
     else if(strcmp(keyword, "false") == 0)
         return token_create(TOKEN_FALSE, keyword, lexer->line);

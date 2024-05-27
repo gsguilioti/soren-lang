@@ -1,14 +1,36 @@
-expr       -> term expr'
+bool            -> join bool_tail 
+bool_tail       -> || join bool_tail 
+                 | &
 
-expr'      -> + term expr' 
-            | - term expr' 
-            | &
+join            -> equality join_tail
+join_tail       -> && equality join_tail
+                 | &
 
-term       -> factor term' 
+equality        -> rel equality_tail
+equality_tail   -> == rel equality_tail
+                 | != rel equality_tail
+                 | &
 
-term'      -> * factor term' 
-            | / factor term' 
-            | &
+rel             -> expr rel_tail
+rel_tail        -> < expr rel_tail
+                 | > expr rel_tail
+                 | <= expr rel_tail
+                 | >= expr rel_tail
+                 | &
 
-factor     -> ( expr ) 
-            | [ - ][0-9]
+expr            -> term expr_tail
+expr_tail       -> + term expr_tail 
+                 | - term expr_tail 
+                 | &
+
+term            -> unary term_tail 
+term_tail       -> * unary term_tail 
+                 | / unary term_tail 
+                 | &
+
+unary           -> [!][-]factor
+
+factor          -> ( expr )
+                 | id
+                 | true | false
+                 | [0-9]

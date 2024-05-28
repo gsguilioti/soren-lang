@@ -172,7 +172,7 @@ struct ast_node* expr_tail(struct parser* parser, struct ast_node* left)
 
 struct ast_node* term(struct parser* parser)
 {
-    struct ast_node* left = factor(parser);
+    struct ast_node* left = unary(parser);
     return term_tail(parser, left);
 }
 
@@ -181,7 +181,7 @@ struct ast_node* term_tail(struct parser* parser, struct ast_node* left)
     struct token* token = peek(parser);
     if(match(parser, TOKEN_MULT) || match(parser, TOKEN_DIV))
     {
-        struct ast_node* right = factor(parser);
+        struct ast_node* right = unary(parser);
         struct ast_node* binary = ast_binary(BINARY, *token, left, right);
         return term_tail(parser, binary);
     }
@@ -192,7 +192,7 @@ struct ast_node* term_tail(struct parser* parser, struct ast_node* left)
 struct ast_node* unary(struct parser* parser)
 {
     struct token* token = peek(parser);
-    if(match(parser, TOKEN_NOT))
+    if(match(parser, TOKEN_NOT) || match(parser, TOKEN_MINUS))
         return ast_unary(UNARY, *token, factor(parser));
 
     return factor(parser);

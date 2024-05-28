@@ -198,9 +198,7 @@ struct token* lexer_keyword(struct lexer* lexer)
 
 struct token* lexer_handle_minus(struct lexer* lexer)
 {
-    if(isdigit(lexer->content[lexer->pos+1]))
-        return lexer_num(lexer);
-    else if(lexer->content[lexer->pos+1] == '=')
+    if(lexer->content[lexer->pos+1] == '=')
         return lexer_op(lexer, TOKEN_MINUSEQUAL, "-=");
 
     return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));

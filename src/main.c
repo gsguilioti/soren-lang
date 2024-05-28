@@ -73,8 +73,8 @@ void print_ast(struct ast_node* node)
             printf("%s ", node->logical->op.lexeme);
             break;
         case UNARY:
+            printf("%s", node->unary->op.lexeme);
             print_ast(node->unary->right);
-            printf("%s ", node->unary->op.lexeme);
             break;
         case LITERAL:
             printf("%s ", node->literal->value.lexeme);

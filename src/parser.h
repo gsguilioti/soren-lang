@@ -31,6 +31,7 @@ struct ast_node* expr(struct parser* parser);
 struct ast_node* expr_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* term(struct parser* parser);
 struct ast_node* term_tail(struct parser* parser, struct ast_node* left);
+struct ast_node* unary(struct parser* parser);
 struct ast_node* factor(struct parser* parser);
 
 #endif

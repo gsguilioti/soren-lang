@@ -9,7 +9,28 @@ static struct ast_node* ast_node()
     return new;
 }
 
-struct ast_node* ast_binary(int type, struct token op, struct ast_node* left, struct ast_node* right)
+struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer)
+{
+    struct ast_node* node = ast_node();
+    node->type = VARDECL;
+    node->vardecl = (struct ast_vardecl*)malloc(sizeof(struct ast_vardecl));
+    node->vardecl->name = name;
+    node->vardecl->initializer = initializer;
+    return node;
+}
+
+struct ast_node* ast_assign(struct token name, struct ast_node* value)
+{
+    struct ast_node* node = ast_node();
+    node->type = ASSIGN;
+    node->assign = (struct ast_assign*)malloc(sizeof(struct ast_assign));
+    node->assign->name = name;
+    node->assign->value = value;
+    return node;
+}
+
+
+struct ast_node* ast_binary(struct token op, struct ast_node* left, struct ast_node* right)
 {
     struct ast_node* node = ast_node();
     node->type = BINARY;
@@ -21,7 +42,7 @@ struct ast_node* ast_binary(int type, struct token op, struct ast_node* left, st
     return node;
 }
 
-struct ast_node* ast_logical(int type, struct token op, struct ast_node* left, struct ast_node* right)
+struct ast_node* ast_logical(struct token op, struct ast_node* left, struct ast_node* right)
 {
     struct ast_node* node = ast_node();
     node->type = LOGICAL;
@@ -33,7 +54,7 @@ struct ast_node* ast_logical(int type, struct token op, struct ast_node* left, s
     return node;
 }
 
-struct ast_node* ast_unary(int type, struct token op, struct ast_node* right)
+struct ast_node* ast_unary(struct token op, struct ast_node* right)
 {
     struct ast_node* node = ast_node();
     node->type = UNARY;
@@ -43,7 +64,7 @@ struct ast_node* ast_unary(int type, struct token op, struct ast_node* right)
     return node;
 }
 
-struct ast_node* ast_literal(int type, int literal_type, struct token value)
+struct ast_node* ast_literal(int literal_type, struct token value)
 {
     struct ast_node* node = ast_node();
     node->type = LITERAL;
@@ -53,7 +74,7 @@ struct ast_node* ast_literal(int type, int literal_type, struct token value)
     return node;
 }
 
-struct ast_node* ast_variable(int type, struct token value)
+struct ast_node* ast_variable(struct token value)
 {
     struct ast_node* node = ast_node();
     node->type = VARIABLE;

@@ -1,36 +1,48 @@
+program         -> {decl} $
+
+decl            -> vardecl
+                 | stmt
+                 
+vardecl         -> VAR ID ( '=' bool );
+
+stmt            -> bool ;
+                 | assign
+
+assign          -> ID '=' bool ;
+
 bool            -> join bool_tail 
-bool_tail       -> || join bool_tail 
+bool_tail       -> '||' join bool_tail 
                  | &
 
 join            -> equality join_tail
-join_tail       -> && equality join_tail
+join_tail       -> '&&' equality join_tail
                  | &
 
 equality        -> rel equality_tail
-equality_tail   -> == rel equality_tail
-                 | != rel equality_tail
+equality_tail   -> '==' rel equality_tail
+                 | '!=' rel equality_tail
                  | &
 
 rel             -> expr rel_tail
-rel_tail        -> < expr rel_tail
-                 | > expr rel_tail
-                 | <= expr rel_tail
-                 | >= expr rel_tail
+rel_tail        -> '<' expr rel_tail
+                 | '>' expr rel_tail
+                 | '<=' expr rel_tail
+                 | '>=' expr rel_tail
                  | &
 
 expr            -> term expr_tail
-expr_tail       -> + term expr_tail 
-                 | - term expr_tail 
+expr_tail       -> '+' term expr_tail 
+                 | '-' term expr_tail 
                  | &
 
 term            -> unary term_tail 
-term_tail       -> * unary term_tail 
-                 | / unary term_tail 
+term_tail       -> '*' unary term_tail 
+                 | '/' unary term_tail 
                  | &
 
-unary           -> [!][-]factor
+unary           -> ['!']['-']factor
 
-factor          -> ( expr )
-                 | id
-                 | true | false
+factor          -> '(' expr ')'
+                 | ID
+                 | TRUE | FALSE
                  | [0-9]

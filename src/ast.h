@@ -6,8 +6,9 @@
 
 enum ast_type
 {
-    BINARY, LOGICAL,
-    LITERAL, VARIABLE, UNARY,
+    ASSIGN, VARDECL,
+    BINARY, LOGICAL, UNARY,
+    LITERAL, VARIABLE
 };
 
 struct ast_node
@@ -20,8 +21,23 @@ struct ast_node
         struct ast_unary* unary;
         struct ast_literal* literal;
         struct ast_variable* variable;
+        struct ast_assign* assign;
+        struct ast_vardecl* vardecl;
     };
 };
+
+struct ast_vardecl
+{
+    struct token name;
+    struct ast_node* initializer;
+};
+
+struct ast_assign
+{
+    struct token name;
+    struct ast_node* value;
+};
+
 
 struct ast_binary
 {
@@ -55,10 +71,13 @@ struct ast_variable
     struct token name;
 };
 
-struct ast_node* ast_binary(int type, struct token op, struct ast_node* left, struct ast_node* right);
-struct ast_node* ast_logical(int type, struct token op, struct ast_node* left, struct ast_node* right);
-struct ast_node* ast_unary(int type, struct token op, struct ast_node* right);
-struct ast_node* ast_literal(int type, int literal_type, struct token value);
-struct ast_node* ast_variable(int type, struct token value);
+struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer);
+struct ast_node* ast_assign(struct token name, struct ast_node* value);
+struct ast_node* ast_unary(struct token op, struct ast_node* right);
+struct ast_node* ast_binary(struct token op, struct ast_node* left, struct ast_node* right);
+struct ast_node* ast_logical(struct token op, struct ast_node* left, struct ast_node* right);
+struct ast_node* ast_unary(struct token op, struct ast_node* right);
+struct ast_node* ast_literal(int literal_type, struct token value);
+struct ast_node* ast_variable(struct token value);
 
 #endif

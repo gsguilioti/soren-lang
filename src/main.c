@@ -55,33 +55,65 @@ void print_tokens(struct token_list* list)
     printf("Token: [%d, %s, %d]\n", aux->token->type, aux->token->lexeme, aux->token->line);
 }
 
-void print_ast(struct ast_node* node)
+void print_spaces(int space)
 {
-    if (node == NULL) 
+    for (int i = 10; i < space; i++) 
+        printf("  ");
+}
+
+void print_ast(struct ast_node* node, int space, int unary)
+{
+    if (node == NULL) {
         return;
-    
-    switch (node->type) 
+    }
+
+    space += 10;
+
+    switch (node->type)
     {
         case BINARY:
-            print_ast(node->binary->left);
-            print_ast(node->binary->right);
-            printf("%s ", node->binary->op.lexeme);
+            print_ast(node->binary->right, space, 0);
+            print_spaces(space);
+            printf("%s\n", node->binary->op.lexeme);
+            print_ast(node->binary->left, space, 0);
             break;
         case LOGICAL:
-            print_ast(node->logical->left);
-            print_ast(node->logical->right);
-            printf("%s ", node->logical->op.lexeme);
+            print_ast(node->logical->right, space, 0);
+            print_spaces(space);
+            printf("%s\n", node->logical->op.lexeme);
+            print_ast(node->logical->left, space, 0);
             break;
         case UNARY:
+            print_spaces(space);
             printf("%s", node->unary->op.lexeme);
-            print_ast(node->unary->right);
+            print_ast(node->unary->right, space, 1);
             break;
         case LITERAL:
-            printf("%s ", node->literal->value.lexeme);
+            if(!unary)
+                print_spaces(space);
+            printf("%s\n", node->literal->value.lexeme);
             break;
         case VARIABLE:
-            printf("%s ", node->variable->name.lexeme);
+            if(!unary)
+                print_spaces(space);
+            printf("%s\n", node->variable->name.lexeme);
             break;
+        case ASSIGN:
+            print_ast(node->assign->value, space, 0);
+            print_spaces(space);
+            printf("=\n");
+            print_spaces(space+10);
+            printf("%s\n", node->assign->name.lexeme);
+            break;
+        case VARDECL:
+            print_ast(node->vardecl->initializer, space, 0);
+            print_spaces(space);
+            printf("vardecl\n");
+            print_spaces(space+10);
+            printf("%s\n", node->vardecl->name.lexeme);
+            break;
+        default:
+            exit(1);
     }
 }
 
@@ -102,8 +134,8 @@ int main(int argc, char* argv[])
     print_tokens(lexer_read(lexer));
     
     struct parser* parser = parser_init(lexer_read(lexer));
-    struct ast_node* ast = bool(parser);
-    print_ast(ast);
+    struct ast_node* ast = decl(parser);
+    print_ast(ast, 0, 0);
     printf("\n");
 
     return 0;

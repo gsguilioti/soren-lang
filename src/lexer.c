@@ -113,6 +113,7 @@ struct token* lexer_collect(struct lexer* lexer)
         case '}': return lexer_op(lexer, TOKEN_RBRACE, lexer_tostring_char(lexer));
         case '[': return lexer_op(lexer, TOKEN_LSQUARE, lexer_tostring_char(lexer));
         case ']': return lexer_op(lexer, TOKEN_RSQUARE, lexer_tostring_char(lexer));
+        case ';': return lexer_op(lexer, TOKEN_ENDLINE, lexer_tostring_char(lexer));
     }
 
     return NULL;
@@ -192,6 +193,8 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_TRUE, keyword, lexer->line);
     else if(strcmp(keyword, "false") == 0)
         return token_create(TOKEN_FALSE, keyword, lexer->line);
+    else if(strcmp(keyword, "var") == 0)
+        return token_create(TOKEN_VAR, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }

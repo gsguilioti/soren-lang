@@ -78,8 +78,30 @@ struct ast_node* decl(struct parser* parser)
         return NULL;
     else if(match(parser, TOKEN_VAR))
         return vardecl(parser);
+    else if(match(parser, TOKEN_FUNCTION))
+        return fundecl(parser);
 
     return stmt(parser);
+}
+
+struct ast_node* fundecl(struct parser* parser)
+{
+    struct token* name = consume(parser, TOKEN_ID);
+    consume(parser, TOKEN_LPAREN);
+    struct token_list* params = token_list_init();
+    if(!check(parser, TOKEN_RPAREN))
+    {
+        do
+        {
+            token_list_add(params, consume(parser, TOKEN_ID));
+        }
+        while(match(parser, TOKEN_COMMA));
+    }
+    
+    consume(parser, TOKEN_RPAREN);
+    consume(parser, TOKEN_LBRACE);
+    struct ast_node* body = block(parser);
+    return ast_function(*name, params, body->block->statements);
 }
 
 struct ast_node* vardecl(struct parser* parser)

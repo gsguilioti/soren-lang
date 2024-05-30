@@ -20,6 +20,7 @@ struct token* previous(struct parser* parser);
 struct token* consume(struct parser* parser, int type);
 
 struct ast_node* decl(struct parser* parser);
+struct ast_node* fundecl(struct parser* parser);
 struct ast_node* vardecl(struct parser* parser);
 struct ast_node* stmt(struct parser* parser);
 struct ast_node* loop(struct parser* parser);

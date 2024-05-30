@@ -9,6 +9,17 @@ static struct ast_node* ast_node()
     return new;
 }
 
+struct ast_node* ast_function(struct token name, struct token_list* params, struct ast_list* body)
+{
+    struct ast_node* node = ast_node();
+    node->type = FUNDECL;
+    node->function = (struct ast_function*)malloc(sizeof(struct ast_function));
+    node->function->name = name;
+    node->function->params = params;
+    node->function->body = body;
+    return node;
+}
+
 struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer)
 {
     struct ast_node* node = ast_node();

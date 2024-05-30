@@ -114,6 +114,7 @@ struct token* lexer_collect(struct lexer* lexer)
         case '[': return lexer_op(lexer, TOKEN_LSQUARE, lexer_tostring_char(lexer));
         case ']': return lexer_op(lexer, TOKEN_RSQUARE, lexer_tostring_char(lexer));
         case ';': return lexer_op(lexer, TOKEN_ENDLINE, lexer_tostring_char(lexer));
+        case ',': return lexer_op(lexer, TOKEN_COMMA, lexer_tostring_char(lexer));
     }
 
     printf("Lexical error: symbol not recognized: %c\naborting...\n", lexer->current);
@@ -202,6 +203,8 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_ELSE, keyword, lexer->line);
     else if(strcmp(keyword, "loop") == 0)
         return token_create(TOKEN_LOOP, keyword, lexer->line);
+    else if(strcmp(keyword, "fn") == 0)
+        return token_create(TOKEN_FUNCTION, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }

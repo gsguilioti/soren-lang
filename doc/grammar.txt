@@ -1,8 +1,11 @@
 program         -> {decl} $
 
 decl            -> vardecl
+                 | fundecl
                  | stmt
                  
+fundecl         -> FN ID '(' ( ID ( {',' ID} ) ) ')' block
+
 vardecl         -> VAR ID ( '=' bool );
 
 stmt            -> bool ;

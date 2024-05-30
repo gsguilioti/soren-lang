@@ -102,10 +102,21 @@ struct ast_node* stmt(struct parser* parser)
         return block(parser);
     else if(match(parser, TOKEN_IF))
         return _if(parser);
+    else if(match(parser, TOKEN_LOOP))
+        return loop(parser);
 
     struct ast_node* expr = bool(parser);
     consume(parser, TOKEN_ENDLINE);
     return expr;
+}
+
+struct ast_node* loop(struct parser* parser)
+{
+    consume(parser, TOKEN_LPAREN);
+    struct ast_node* condition = bool(parser);
+    consume(parser, TOKEN_RPAREN);
+    struct ast_node* body = stmt(parser);
+    return ast_loop(condition, body);
 }
 
 struct ast_node* _if(struct parser* parser)

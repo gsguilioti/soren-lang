@@ -9,6 +9,9 @@ stmt            -> bool ;
                  | assign
                  | block
                  | if
+                 | loop
+
+loop            -> LOOP(condition) stmt
 
 if              -> IF '(' bool ')' stmt if_tail
 if_tail         -> ELSE stmt

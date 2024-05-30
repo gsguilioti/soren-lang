@@ -200,6 +200,8 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_IF, keyword, lexer->line);
     else if(strcmp(keyword, "else") == 0)
         return token_create(TOKEN_ELSE, keyword, lexer->line);
+    else if(strcmp(keyword, "loop") == 0)
+        return token_create(TOKEN_LOOP, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }

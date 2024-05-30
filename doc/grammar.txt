@@ -7,9 +7,9 @@ fundecl         -> FN ID '(' ( ID ( {',' ID} ) ) ')' block
 
 vardecl         -> VAR ID ( '=' bool );
 
-stmt            -> bool;
-                 | BREAK;
-                 | CONTINUE;
+stmt            -> assign
+                 | BREAK ';'
+                 | CONTINUE ';'
                  | return
                  | assign
                  | block
@@ -22,9 +22,10 @@ if              -> IF '(' bool ')' stmt if_tail
 if_tail         -> ELSE stmt
                  | &
 
-assign          -> ID '=' bool ;
+assign          -> ID '=' bool ';'
+                 | bool ';'
 
-return          -> RETURN ( bool );
+return          -> RETURN ( assign );
 
 block           -> '{' {(vardecl | stmt)} '}'
 

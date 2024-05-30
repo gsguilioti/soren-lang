@@ -134,6 +134,20 @@ struct ast_node* ast_variable(struct token value)
     return node;
 }
 
+struct ast_node* ast_break()
+{
+    struct ast_node* node = malloc(sizeof(struct ast_node));
+    node->type = BREAK;
+    return node;
+}
+
+struct ast_node* ast_continue()
+{
+    struct ast_node* node = malloc(sizeof(struct ast_node));
+    node->type = CONTINUE;
+    return node;
+}
+
 /* 
 * =======================
 * ast list implementation

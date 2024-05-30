@@ -125,10 +125,7 @@ struct ast_node* vardecl(struct parser* parser)
 
 struct ast_node* stmt(struct parser* parser)
 {
-    struct token* token = peek(parser);
-    if(match(parser, TOKEN_ID))
-        return assign(parser, *token);
-    else if(match(parser, TOKEN_LBRACE))
+    if(match(parser, TOKEN_LBRACE))
         return block(parser);
     else if(match(parser, TOKEN_IF))
         return _if(parser);
@@ -136,16 +133,18 @@ struct ast_node* stmt(struct parser* parser)
         return loop(parser);
     else if(match(parser, TOKEN_RETURN))
         return _return(parser);
-    else if(match(parser, TOKEN_BREAK) || match(parser, TOKEN_CONTINUE))
+    else if(match(parser, TOKEN_BREAK))
     {
-        consume(parser, TOKEN_ENDLINE);
-        /* placeholder*/
-        return stmt(parser);
+        consume(parser, TOKEN_ENDLINE);     
+        return ast_break();
+    }
+    else if(match(parser, TOKEN_CONTINUE))
+    {
+        consume(parser, TOKEN_ENDLINE);        
+        return ast_continue();
     }
 
-    struct ast_node* expr = bool(parser);
-    consume(parser, TOKEN_ENDLINE);
-    return expr;
+    return  assign(parser);
 }
 
 struct ast_node* loop(struct parser* parser)
@@ -175,13 +174,19 @@ struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, stru
     return ast_if(condition, then, _else);
 }
 
-struct ast_node* assign(struct parser* parser, struct token name)
+struct ast_node* assign(struct parser* parser)
 {
-    struct ast_node* value = NULL;
-    consume(parser, TOKEN_ASSIGN);
+    struct token* name = peek(parser);
+    struct ast_node* value = bool(parser);
+    if(!match(parser, TOKEN_ASSIGN))
+    {
+        consume(parser, TOKEN_ENDLINE);
+        return value;
+    }
+
     value = bool(parser);
     consume(parser, TOKEN_ENDLINE);
-    return ast_assign(name, value);
+    return ast_assign(*name, value);
 }
 
 struct ast_node* _return(struct parser* parser)
@@ -189,8 +194,10 @@ struct ast_node* _return(struct parser* parser)
     struct token* keyword = previous(parser);
     struct ast_node* value = NULL;
     if(!check(parser, TOKEN_ENDLINE))
-        //include assign latter
-        value = bool(parser);
+    {
+        value = assign(parser);
+        return ast_return(*keyword, value);
+    }
 
     consume(parser, TOKEN_ENDLINE);
     return ast_return(*keyword, value);

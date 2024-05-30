@@ -22,6 +22,8 @@ struct token* consume(struct parser* parser, int type);
 struct ast_node* decl(struct parser* parser);
 struct ast_node* vardecl(struct parser* parser);
 struct ast_node* stmt(struct parser* parser);
+struct ast_node* _if(struct parser* parser);
+struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, struct ast_node* then);
 struct ast_node* assign(struct parser* parser, struct token name);
 struct ast_node* block(struct parser* parser);
 struct ast_node* bool(struct parser* parser);

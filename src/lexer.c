@@ -196,6 +196,10 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_FALSE, keyword, lexer->line);
     else if(strcmp(keyword, "var") == 0)
         return token_create(TOKEN_VAR, keyword, lexer->line);
+    else if(strcmp(keyword, "if") == 0)
+        return token_create(TOKEN_IF, keyword, lexer->line);
+    else if(strcmp(keyword, "else") == 0)
+        return token_create(TOKEN_ELSE, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }

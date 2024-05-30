@@ -19,6 +19,18 @@ struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer)
     return node;
 }
 
+struct ast_node* ast_if(struct ast_node* condition, struct ast_node* then, struct ast_node* _else)
+{
+    struct ast_node* node = ast_node();
+    node->type = IF;
+    node->_if = (struct ast_if*)malloc(sizeof(struct ast_if));
+    node->_if->condition = condition;
+    node->_if->then = then;
+    node->_if->_else = _else;
+    return node;
+}
+
+
 struct ast_node* ast_assign(struct token name, struct ast_node* value)
 {
     struct ast_node* node = ast_node();

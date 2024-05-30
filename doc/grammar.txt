@@ -8,6 +8,11 @@ vardecl         -> VAR ID ( '=' bool );
 stmt            -> bool ;
                  | assign
                  | block
+                 | if
+
+if              -> IF '(' bool ')' stmt if_tail
+if_tail         -> ELSE stmt
+                 | &
 
 assign          -> ID '=' bool ;
 

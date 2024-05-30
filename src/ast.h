@@ -6,7 +6,8 @@
 
 enum ast_type
 {
-    ASSIGN, BLOCK, VARDECL,
+    VARDECL,
+    ASSIGN, BLOCK, IF,
     BINARY, LOGICAL, UNARY,
     LITERAL, VARIABLE
 };
@@ -24,6 +25,7 @@ struct ast_node
         struct ast_assign* assign;
         struct ast_vardecl* vardecl;
         struct ast_block* block;
+        struct ast_if* _if;
     };
 };
 
@@ -31,6 +33,13 @@ struct ast_vardecl
 {
     struct token name;
     struct ast_node* initializer;
+};
+
+struct ast_if
+{
+    struct ast_node* condition;
+    struct ast_node* then;
+    struct ast_node* _else;
 };
 
 struct ast_assign
@@ -77,6 +86,7 @@ struct ast_variable
 };
 
 struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer);
+struct ast_node* ast_if(struct ast_node* condition, struct ast_node* then, struct ast_node* _else);
 struct ast_node* ast_assign(struct token name, struct ast_node* value);
 struct ast_node* ast_block(struct ast_list* statements);
 struct ast_node* ast_unary(struct token op, struct ast_node* right);

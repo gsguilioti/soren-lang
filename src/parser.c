@@ -100,8 +100,30 @@ struct ast_node* stmt(struct parser* parser)
         return assign(parser, *token);
     else if(match(parser, TOKEN_LBRACE))
         return block(parser);
+    else if(match(parser, TOKEN_IF))
+        return _if(parser);
 
-    return bool(parser);
+    struct ast_node* expr = bool(parser);
+    consume(parser, TOKEN_ENDLINE);
+    return expr;
+}
+
+struct ast_node* _if(struct parser* parser)
+{
+    consume(parser, TOKEN_LPAREN);
+    struct ast_node* condition = bool(parser);
+    consume(parser, TOKEN_RPAREN);
+    struct ast_node* then = stmt(parser);
+    return if_tail(parser, condition, then);
+}
+
+struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, struct ast_node* then)
+{
+    struct ast_node* _else = NULL;
+    if(match(parser, TOKEN_ELSE))
+        _else = stmt(parser);
+
+    return ast_if(condition, then, _else);
 }
 
 struct ast_node* assign(struct parser* parser, struct token name)

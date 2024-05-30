@@ -27,6 +27,7 @@ struct ast_node* loop(struct parser* parser);
 struct ast_node* _if(struct parser* parser);
 struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, struct ast_node* then);
 struct ast_node* assign(struct parser* parser, struct token name);
+struct ast_node* _return(struct parser* parser);
 struct ast_node* block(struct parser* parser);
 struct ast_node* bool(struct parser* parser);
 struct ast_node* bool_tail(struct parser* parser, struct ast_node* left);

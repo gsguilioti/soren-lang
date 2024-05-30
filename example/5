@@ -3,4 +3,5 @@ fn test(a, b)
     var c = 5;
     a = b;
     true;
+    return a;
 }

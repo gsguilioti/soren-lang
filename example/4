@@ -1,7 +1,7 @@
-if(true)
+fn a(b)
 {
     if( 10 + 3)
-        a = 5;
+        continue;
 
     var a = 0;
     loop(a < 3)

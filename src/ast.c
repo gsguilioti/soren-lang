@@ -52,7 +52,6 @@ struct ast_node* ast_if(struct ast_node* condition, struct ast_node* then, struc
     return node;
 }
 
-
 struct ast_node* ast_assign(struct token name, struct ast_node* value)
 {
     struct ast_node* node = ast_node();
@@ -60,6 +59,16 @@ struct ast_node* ast_assign(struct token name, struct ast_node* value)
     node->assign = (struct ast_assign*)malloc(sizeof(struct ast_assign));
     node->assign->name = name;
     node->assign->value = value;
+    return node;
+}
+
+struct ast_node* ast_return(struct token name, struct ast_node* value)
+{
+    struct ast_node* node = ast_node();
+    node->type = RETURN;
+    node->_return = (struct ast_return*)malloc(sizeof(struct ast_return));
+    node->_return->name = name;
+    node->_return->value = value;
     return node;
 }
 

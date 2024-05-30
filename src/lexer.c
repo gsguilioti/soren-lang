@@ -205,6 +205,12 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_LOOP, keyword, lexer->line);
     else if(strcmp(keyword, "fn") == 0)
         return token_create(TOKEN_FUNCTION, keyword, lexer->line);
+    else if(strcmp(keyword, "break") == 0)
+        return token_create(TOKEN_BREAK, keyword, lexer->line);
+    else if(strcmp(keyword, "continue") == 0)
+        return token_create(TOKEN_CONTINUE, keyword, lexer->line);
+    else if(strcmp(keyword, "return") == 0)
+        return token_create(TOKEN_RETURN, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }

@@ -64,6 +64,14 @@ struct token* previous(struct parser* parser)
     return token_at(parser->tokens, parser->pos -1);
 }
 
+struct token* next(struct parser* parser)
+{
+    if(at_end(parser))
+        return NULL;
+
+    return token_at(parser->tokens, parser->pos +1);
+}
+
 struct token* consume(struct parser* parser, int type)
 {
     if(check(parser, type))
@@ -81,7 +89,7 @@ struct ast_node* decl(struct parser* parser)
     else if(match(parser, TOKEN_FUNCTION))
         return fundecl(parser);
 
-    return stmt(parser);
+    error(parser);
 }
 
 struct ast_node* fundecl(struct parser* parser)
@@ -126,6 +134,14 @@ struct ast_node* stmt(struct parser* parser)
         return _if(parser);
     else if(match(parser, TOKEN_LOOP))
         return loop(parser);
+    else if(match(parser, TOKEN_RETURN))
+        return _return(parser);
+    else if(match(parser, TOKEN_BREAK) || match(parser, TOKEN_CONTINUE))
+    {
+        consume(parser, TOKEN_ENDLINE);
+        /* placeholder*/
+        return stmt(parser);
+    }
 
     struct ast_node* expr = bool(parser);
     consume(parser, TOKEN_ENDLINE);
@@ -162,10 +178,22 @@ struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, stru
 struct ast_node* assign(struct parser* parser, struct token name)
 {
     struct ast_node* value = NULL;
-    match(parser, TOKEN_ASSIGN);
+    consume(parser, TOKEN_ASSIGN);
     value = bool(parser);
     consume(parser, TOKEN_ENDLINE);
     return ast_assign(name, value);
+}
+
+struct ast_node* _return(struct parser* parser)
+{
+    struct token* keyword = previous(parser);
+    struct ast_node* value = NULL;
+    if(!check(parser, TOKEN_ENDLINE))
+        //include assign latter
+        value = bool(parser);
+
+    consume(parser, TOKEN_ENDLINE);
+    return ast_return(*keyword, value);
 }
 
 struct ast_node* block(struct parser* parser)

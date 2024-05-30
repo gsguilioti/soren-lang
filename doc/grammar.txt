@@ -2,13 +2,15 @@ program         -> {decl} $
 
 decl            -> vardecl
                  | fundecl
-                 | stmt
                  
 fundecl         -> FN ID '(' ( ID ( {',' ID} ) ) ')' block
 
 vardecl         -> VAR ID ( '=' bool );
 
-stmt            -> bool ;
+stmt            -> bool;
+                 | BREAK;
+                 | CONTINUE;
+                 | return
                  | assign
                  | block
                  | if
@@ -21,6 +23,8 @@ if_tail         -> ELSE stmt
                  | &
 
 assign          -> ID '=' bool ;
+
+return          -> RETURN ( bool );
 
 block           -> '{' {(vardecl | stmt)} '}'
 

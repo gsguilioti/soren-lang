@@ -29,6 +29,14 @@ struct ast_node* ast_assign(struct token name, struct ast_node* value)
     return node;
 }
 
+struct ast_node* ast_block(struct ast_list* statements)
+{
+    struct ast_node* node = ast_node();
+    node->type = BLOCK;
+    node->block = (struct ast_block*)malloc(sizeof(struct ast_block));
+    node->block->statements = statements;
+    return node;
+}
 
 struct ast_node* ast_binary(struct token op, struct ast_node* left, struct ast_node* right)
 {
@@ -81,4 +89,38 @@ struct ast_node* ast_variable(struct token value)
     node->variable = (struct ast_variable*)malloc(sizeof(struct ast_variable));
     node->variable->name = value;
     return node;
+}
+
+/* 
+* =======================
+* ast list implementation
+* =======================
+*/
+struct ast_list* ast_list_init()
+{
+    struct ast_list* new = (struct ast_list*)malloc(sizeof(struct ast_list));
+    new->size = 0;
+    new->head = NULL;
+}
+
+void ast_list_add(struct ast_list* list, struct ast_node* node)
+{
+    struct ast_list_node* new = (struct ast_list_node*)malloc(sizeof(struct ast_list_node));
+    new->next = NULL;
+    new->value = node;
+
+    if(list->head == NULL)
+    {
+        list->head = new;
+        list->size += 1;
+        return;
+    }
+
+    struct ast_list_node* aux = list->head;
+    while(aux->next != NULL)
+        aux = aux->next;
+
+    aux->next = new;
+    list->size += 1;
+    return;
 }

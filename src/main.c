@@ -134,8 +134,12 @@ int main(int argc, char* argv[])
     print_tokens(lexer_read(lexer));
     
     struct parser* parser = parser_init(lexer_read(lexer));
-    struct ast_node* ast = decl(parser);
-    print_ast(ast, 0, 0);
+    struct ast_node* statement = decl(parser);
+    while(statement != NULL)
+    {
+        //print_ast(statement, 0, 0);
+        statement = decl(parser);
+    }
     printf("\n");
 
     return 0;

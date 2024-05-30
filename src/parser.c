@@ -74,7 +74,9 @@ struct token* consume(struct parser* parser, int type)
 
 struct ast_node* decl(struct parser* parser)
 {
-    if(match(parser, TOKEN_VAR))
+    if(at_end(parser))
+        return NULL;
+    else if(match(parser, TOKEN_VAR))
         return vardecl(parser);
 
     return stmt(parser);
@@ -96,6 +98,8 @@ struct ast_node* stmt(struct parser* parser)
     struct token* token = peek(parser);
     if(match(parser, TOKEN_ID))
         return assign(parser, *token);
+    else if(match(parser, TOKEN_LBRACE))
+        return block(parser);
 
     return bool(parser);
 }
@@ -107,6 +111,20 @@ struct ast_node* assign(struct parser* parser, struct token name)
     value = bool(parser);
     consume(parser, TOKEN_ENDLINE);
     return ast_assign(name, value);
+}
+
+struct ast_node* block(struct parser* parser)
+{
+    struct ast_list* statements = ast_list_init();
+    while(peek(parser)->type != TOKEN_RBRACE)
+    {
+        if(match(parser, TOKEN_VAR))
+            ast_list_add(statements, vardecl(parser));
+        else
+            ast_list_add(statements, stmt(parser));
+    }
+    consume(parser, TOKEN_RBRACE);
+    return ast_block(statements);
 }
 
 struct ast_node* bool(struct parser* parser)

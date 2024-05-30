@@ -116,7 +116,8 @@ struct token* lexer_collect(struct lexer* lexer)
         case ';': return lexer_op(lexer, TOKEN_ENDLINE, lexer_tostring_char(lexer));
     }
 
-    return NULL;
+    printf("Lexical error: symbol not recognized: %c\naborting...\n", lexer->current);
+    exit(1);
 }
 
 struct token* lexer_op(struct lexer* lexer, int type, char* op)

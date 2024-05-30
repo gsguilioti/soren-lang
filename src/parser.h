@@ -23,6 +23,7 @@ struct ast_node* decl(struct parser* parser);
 struct ast_node* vardecl(struct parser* parser);
 struct ast_node* stmt(struct parser* parser);
 struct ast_node* assign(struct parser* parser, struct token name);
+struct ast_node* block(struct parser* parser);
 struct ast_node* bool(struct parser* parser);
 struct ast_node* bool_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* join(struct parser* parser);

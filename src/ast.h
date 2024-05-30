@@ -6,7 +6,7 @@
 
 enum ast_type
 {
-    ASSIGN, VARDECL,
+    ASSIGN, BLOCK, VARDECL,
     BINARY, LOGICAL, UNARY,
     LITERAL, VARIABLE
 };
@@ -23,6 +23,7 @@ struct ast_node
         struct ast_variable* variable;
         struct ast_assign* assign;
         struct ast_vardecl* vardecl;
+        struct ast_block* block;
     };
 };
 
@@ -38,6 +39,10 @@ struct ast_assign
     struct ast_node* value;
 };
 
+struct ast_block
+{
+    struct ast_list* statements;
+};
 
 struct ast_binary
 {
@@ -73,11 +78,32 @@ struct ast_variable
 
 struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer);
 struct ast_node* ast_assign(struct token name, struct ast_node* value);
+struct ast_node* ast_block(struct ast_list* statements);
 struct ast_node* ast_unary(struct token op, struct ast_node* right);
 struct ast_node* ast_binary(struct token op, struct ast_node* left, struct ast_node* right);
 struct ast_node* ast_logical(struct token op, struct ast_node* left, struct ast_node* right);
 struct ast_node* ast_unary(struct token op, struct ast_node* right);
 struct ast_node* ast_literal(int literal_type, struct token value);
 struct ast_node* ast_variable(struct token value);
+
+/* 
+* ===================
+* ast list definition
+* ===================
+*/
+struct ast_list_node
+{
+    struct ast_node* value;
+    struct ast_list_node* next;
+};
+
+struct ast_list
+{
+    struct ast_list_node* head;
+    size_t size;
+};
+
+struct ast_list* ast_list_init();
+void ast_list_add(struct ast_list* list, struct ast_node* token);
 
 #endif

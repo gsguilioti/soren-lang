@@ -7,8 +7,11 @@ vardecl         -> VAR ID ( '=' bool );
 
 stmt            -> bool ;
                  | assign
+                 | block
 
 assign          -> ID '=' bool ;
+
+block           -> '{' {(vardecl | stmt)} '}'
 
 bool            -> join bool_tail 
 bool_tail       -> '||' join bool_tail 

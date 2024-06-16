@@ -70,6 +70,18 @@ void lexer_skip(struct lexer* lexer)
             lexer->line +=1;
         lexer_advance(lexer);
     }
+
+    if(lexer->current == '#')
+        lexer_skip_comment(lexer);
+}
+
+void lexer_skip_comment(struct lexer* lexer)
+{
+    while(lexer->current != '\n')
+        lexer_advance(lexer);
+
+    if(isspace(lexer->current))
+        lexer_skip(lexer);
 }
 
 struct token_list* lexer_read(struct lexer* lexer)
@@ -85,6 +97,9 @@ struct token* lexer_collect(struct lexer* lexer)
 {
     if(isspace(lexer->current))
         lexer_skip(lexer);
+    
+    if(lexer->current == '#')
+        lexer_skip_comment(lexer);
 
     if(isdigit(lexer->current))
         return lexer_num(lexer);

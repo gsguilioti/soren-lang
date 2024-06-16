@@ -20,6 +20,7 @@ struct lexer
 struct lexer* lexer_init(char* content);
 void lexer_advance(struct lexer* lexer);
 void lexer_skip(struct lexer* lexer);
+void lexer_skip_comment(struct lexer* lexer);
 struct token* lexer_collect(struct lexer* lexer);
 struct token* lexer_op(struct lexer* lexer, int type, char* op);
 struct token* lexer_num(struct lexer* lexer);

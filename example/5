@@ -1,5 +1,6 @@
 fn test(a, b)
 {
+    # comment
     var c = 5;
     a = b;
     true;

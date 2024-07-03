@@ -96,7 +96,7 @@ struct ast_unary
     struct ast_node* right;
 };
 
-enum literal_type { INT, BOOL };
+enum literal_type { INT, BOOL, STRING };
 struct ast_literal
 {
     enum literal_type literal_type;

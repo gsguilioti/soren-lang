@@ -122,6 +122,7 @@ struct token* lexer_collect(struct lexer* lexer)
         case '|':
         case '^': 
             return lexer_handle_equality(lexer);
+        case '\'': return lexer_string(lexer);
         case '(': return lexer_op(lexer, TOKEN_LPAREN, lexer_tostring_char(lexer));
         case ')': return lexer_op(lexer, TOKEN_RPAREN, lexer_tostring_char(lexer));
         case '{': return lexer_op(lexer, TOKEN_LBRACE, lexer_tostring_char(lexer));
@@ -228,6 +229,28 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_RETURN, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
+}
+
+struct token* lexer_string(struct lexer* lexer)
+{
+    lexer_advance(lexer);
+    char* string = calloc(2, sizeof(char));
+    string[0] = lexer->current;
+    string[1] = '\0';
+    lexer_advance(lexer);
+    
+    while(lexer->current != '\'')
+    {
+        // todo: syntax error when not close a string
+        char* aux = lexer_tostring_char(lexer);
+        string = realloc(string, (strlen(string) + strlen(aux) + 1) * sizeof(char));
+        strcat(string, aux);
+
+        lexer_advance(lexer);
+    }
+
+    lexer_advance(lexer);
+    return token_create(TOKEN_STRING, string, lexer->line);
 }
 
 struct token* lexer_handle_minus(struct lexer* lexer)

@@ -364,6 +364,10 @@ struct ast_node* factor(struct parser* parser)
         consume(parser, TOKEN_RPAREN);
         return expression;
     }
+    else if(match(parser, TOKEN_STRING))
+    {
+        return ast_literal(STRING, *token);
+    }
     else
         error(parser);
 }

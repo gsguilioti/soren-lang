@@ -115,6 +115,17 @@ struct ast_node* ast_unary(struct token op, struct ast_node* right)
     return node;
 }
 
+struct ast_node* ast_call(struct token paren, struct ast_node* calee, struct ast_list* arguments)
+{
+    struct ast_node* node = ast_node();
+    node->type = CALL;
+    node->call = (struct ast_call*)malloc(sizeof(struct ast_call));
+    node->call->paren = paren;
+    node->call->calee = calee;
+    node->call->arguments = arguments;
+    return node;
+}
+
 struct ast_node* ast_literal(int literal_type, struct token value)
 {
     struct ast_node* node = ast_node();

@@ -144,7 +144,7 @@ struct ast_node* stmt(struct parser* parser)
         return ast_continue();
     }
 
-    return  assign(parser);
+    return assign(parser);
 }
 
 struct ast_node* loop(struct parser* parser)
@@ -178,15 +178,15 @@ struct ast_node* assign(struct parser* parser)
 {
     struct token* name = peek(parser);
     struct ast_node* value = bool(parser);
-    if(!match(parser, TOKEN_ASSIGN))
+
+    if(match(parser, TOKEN_ASSIGN))
     {
+        value = bool(parser);
         consume(parser, TOKEN_ENDLINE);
-        return value;
+        return ast_assign(*name, value);
     }
 
-    value = bool(parser);
-    consume(parser, TOKEN_ENDLINE);
-    return ast_assign(*name, value);
+    return value;
 }
 
 struct ast_node* _return(struct parser* parser)
@@ -338,12 +338,51 @@ struct ast_node* unary(struct parser* parser)
 {
     struct token* token = peek(parser);
     if(match(parser, TOKEN_NOT) || match(parser, TOKEN_MINUS))
-        return ast_unary(*token, factor(parser));
+        return ast_unary(*token, primary(parser));
 
-    return factor(parser);
+    return call(parser);
 }
 
-struct ast_node* factor(struct parser* parser)
+//need to implement dot(call member)
+struct ast_node* call(struct parser* parser)
+{
+    struct ast_node* prim = primary(parser);
+    while(1)
+    {
+        if(match(parser, TOKEN_LPAREN))
+            prim = finish_call(parser, prim);
+        else break;
+    } 
+
+    return prim;
+}
+
+struct ast_node* finish_call(struct parser* parser, struct ast_node* calee)
+{
+    unsigned short count = 0;
+    struct ast_list* arguments = ast_list_init();
+    if(!check(parser, TOKEN_RPAREN))
+    {
+        do
+        {
+            if(count >= 255)
+            {
+                printf("Can't have more than 255 arguments\n");
+                exit(1);
+            }
+
+            ast_list_add(arguments, assign(parser));
+            count++;
+
+        } while(match(parser, TOKEN_COMMA));
+    }
+
+    struct token* paren = consume(parser, TOKEN_RPAREN);
+    return ast_call(*paren, calee, arguments);
+}
+
+
+struct ast_node* primary(struct parser* parser)
 {
     struct token* token = peek(parser);
     if(match(parser, TOKEN_NUM))

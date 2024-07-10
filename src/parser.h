@@ -42,6 +42,8 @@ struct ast_node* expr_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* term(struct parser* parser);
 struct ast_node* term_tail(struct parser* parser, struct ast_node* left);
 struct ast_node* unary(struct parser* parser);
-struct ast_node* factor(struct parser* parser);
+struct ast_node* call(struct parser* parser);
+struct ast_node* finish_call(struct parser* parser, struct ast_node* calee);
+struct ast_node* primary(struct parser* parser);
 
 #endif

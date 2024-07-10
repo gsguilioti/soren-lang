@@ -10,7 +10,7 @@ enum ast_type
     ASSIGN, BLOCK, IF, LOOP,
     RETURN, BREAK, CONTINUE,
     BINARY, LOGICAL, UNARY,
-    LITERAL, VARIABLE
+    LITERAL, VARIABLE, CALL,
 };
 
 struct ast_node
@@ -30,6 +30,7 @@ struct ast_node
         struct ast_loop* loop;
         struct ast_function* function;
         struct ast_return* _return;
+        struct ast_call* call;
     };
 };
 
@@ -96,6 +97,13 @@ struct ast_unary
     struct ast_node* right;
 };
 
+struct ast_call
+{
+    struct token paren;
+    struct ast_node* calee;
+    struct ast_list* arguments;
+};
+
 enum literal_type { INT, BOOL, STRING };
 struct ast_literal
 {
@@ -123,6 +131,7 @@ struct ast_node* ast_logical(struct token op, struct ast_node* left, struct ast_
 struct ast_node* ast_unary(struct token op, struct ast_node* right);
 struct ast_node* ast_literal(int literal_type, struct token value);
 struct ast_node* ast_variable(struct token value);
+struct ast_node* ast_call(struct token paren, struct ast_node* calee, struct ast_list* arguments);
 
 /* 
 * ===================

@@ -1,0 +1,5 @@
+fn main()
+{
+    var a = b();
+    var x = c(y, z);
+}

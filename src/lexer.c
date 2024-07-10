@@ -129,6 +129,7 @@ struct token* lexer_collect(struct lexer* lexer)
         case '}': return lexer_op(lexer, TOKEN_RBRACE, lexer_tostring_char(lexer));
         case '[': return lexer_op(lexer, TOKEN_LSQUARE, lexer_tostring_char(lexer));
         case ']': return lexer_op(lexer, TOKEN_RSQUARE, lexer_tostring_char(lexer));
+        case '.': return lexer_op(lexer, TOKEN_DOT, lexer_tostring_char(lexer));
         case ';': return lexer_op(lexer, TOKEN_ENDLINE, lexer_tostring_char(lexer));
         case ',': return lexer_op(lexer, TOKEN_COMMA, lexer_tostring_char(lexer));
     }

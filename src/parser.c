@@ -134,17 +134,25 @@ struct ast_node* stmt(struct parser* parser)
     else if(match(parser, TOKEN_RETURN))
         return _return(parser);
     else if(match(parser, TOKEN_BREAK))
-    {
-        consume(parser, TOKEN_ENDLINE);     
-        return ast_break();
-    }
+        return _break(parser);
     else if(match(parser, TOKEN_CONTINUE))
-    {
-        consume(parser, TOKEN_ENDLINE);        
-        return ast_continue();
-    }
+        return _continue(parser);
 
-    return assign(parser);
+    struct ast_node* aux = assign(parser);
+    consume(parser, TOKEN_ENDLINE);
+    return aux;
+}
+
+struct ast_node* _break(struct parser* parser)
+{
+    consume(parser, TOKEN_ENDLINE);     
+    return ast_break();
+}
+
+struct ast_node* _continue(struct parser* parser)
+{
+    consume(parser, TOKEN_ENDLINE);        
+    return ast_continue();
 }
 
 struct ast_node* loop(struct parser* parser)
@@ -181,8 +189,10 @@ struct ast_node* assign(struct parser* parser)
 
     if(match(parser, TOKEN_ASSIGN))
     {
+        if(value->type != VARIABLE)
+            error(parser);
+        
         value = bool(parser);
-        consume(parser, TOKEN_ENDLINE);
         return ast_assign(*name, value);
     }
 
@@ -196,6 +206,7 @@ struct ast_node* _return(struct parser* parser)
     if(!check(parser, TOKEN_ENDLINE))
     {
         value = assign(parser);
+        consume(parser, TOKEN_ENDLINE);
         return ast_return(*keyword, value);
     }
 
@@ -343,14 +354,17 @@ struct ast_node* unary(struct parser* parser)
     return call(parser);
 }
 
-//need to implement dot(call member)
 struct ast_node* call(struct parser* parser)
 {
     struct ast_node* prim = primary(parser);
     while(1)
     {
         if(match(parser, TOKEN_LPAREN))
+        {
             prim = finish_call(parser, prim);
+            if(prim->call->calee->type != VARIABLE)
+                error(parser);
+        }
         else break;
     } 
 

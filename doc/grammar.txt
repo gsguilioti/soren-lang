@@ -7,13 +7,17 @@ fundecl         -> FN ID '(' ( ID ( {',' ID} ) ) ')' block
 
 vardecl         -> VAR ID ( '=' bool );
 
+-- always expect ';' after the derivation 
 stmt            -> assign
-                 | BREAK ';'
-                 | CONTINUE ';'
+                 | break
+                 | continue
                  | return
                  | block
                  | if
                  | loop
+
+break           -> BREAK ';'
+continue        -> CONTINUE ';'
 
 loop            -> LOOP(condition) stmt
 
@@ -21,7 +25,7 @@ if              -> IF '(' bool ')' stmt if_tail
 if_tail         -> ELSE stmt
                  | &
 
-assign          -> (call '.' ) ID '=' bool ';'
+assign          -> ID '=' bool ';'
                  | bool ';'
 
 return          -> RETURN ( assign );
@@ -60,8 +64,8 @@ term_tail       -> '*' unary term_tail
 
 unary           -> ['!']['-']primary | call
 
-call            -> primary ( '(' arguments? ')' | "." IDENTIFIER )* ';'
-arguments       -> assign ( "," assign )* ;
+call            -> primary ( '(' arguments? ')' )
+arguments       -> assign ( "," assign )*
 
 primary          -> '(' expr ')'
                  | ID

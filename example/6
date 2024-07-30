@@ -2,4 +2,7 @@ fn main()
 {
     var a = b();
     var x = c(y, z);
+    a = 2;
+    return a;
+    a = 23;
 }

@@ -23,6 +23,8 @@ struct ast_node* decl(struct parser* parser);
 struct ast_node* fundecl(struct parser* parser);
 struct ast_node* vardecl(struct parser* parser);
 struct ast_node* stmt(struct parser* parser);
+struct ast_node* _break(struct parser* parser);
+struct ast_node* _continue(struct parser* parser);
 struct ast_node* loop(struct parser* parser);
 struct ast_node* _if(struct parser* parser);
 struct ast_node* if_tail(struct parser* parser, struct ast_node* condition, struct ast_node* then);

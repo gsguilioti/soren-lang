@@ -3,9 +3,9 @@ program         -> {decl} $
 decl            -> vardecl
                  | fundecl
                  
-fundecl         -> FN ID '(' ( ID ( {',' ID} ) ) ')' block
+fundecl         -> FN ID '(' ( id_type ( {',' id_type} ) ) ')' ( '->' type ) block
 
-vardecl         -> VAR ID ( '=' bool );
+vardecl         -> VAR id_type ( '=' bool );
 
 -- always expect ';' after the derivation 
 stmt            -> assign
@@ -67,8 +67,12 @@ unary           -> ['!']['-']primary | call
 call            -> primary ( '(' arguments? ')' )
 arguments       -> assign ( "," assign )*
 
-primary          -> '(' expr ')'
-                 | ID
-                 | TRUE | FALSE
-                 | [0-9]
-                 | STRING
+primary         -> '(' expr ')'
+                | ID
+                | TRUE | FALSE
+                | [0-9]
+                | STRING
+
+id_type         -> ID (':' type)
+
+type            -> NUM | BOOL | STRING

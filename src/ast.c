@@ -9,23 +9,24 @@ static struct ast_node* ast_node()
     return new;
 }
 
-struct ast_node* ast_function(struct token name, struct token_list* params, struct ast_list* body)
+struct ast_node* ast_function(struct token name, struct ast_list* params, int type, struct ast_list* body)
 {
     struct ast_node* node = ast_node();
     node->type = FUNDECL;
     node->function = (struct ast_function*)malloc(sizeof(struct ast_function));
     node->function->name = name;
     node->function->params = params;
+    node->function->return_type = type;
     node->function->body = body;
     return node;
 }
 
-struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer)
+struct ast_node* ast_vardecl(struct ast_node* var, struct ast_node* initializer)
 {
     struct ast_node* node = ast_node();
     node->type = VARDECL;
     node->vardecl = (struct ast_vardecl*)malloc(sizeof(struct ast_vardecl));
-    node->vardecl->name = name;
+    node->vardecl->var = var;
     node->vardecl->initializer = initializer;
     return node;
 }

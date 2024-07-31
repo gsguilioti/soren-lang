@@ -1,7 +1,9 @@
-fn main()
+var string: str = 'oi';
+
+fn main(a: num, b: bool)
 {
-    var a = b();
-    var x = c(y, z);
+    var a: num = b();
+    var x: str = c(y, z);
     a = 2;
     return a;
     a = 23;

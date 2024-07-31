@@ -130,6 +130,7 @@ struct token* lexer_collect(struct lexer* lexer)
         case '[': return lexer_op(lexer, TOKEN_LSQUARE, lexer_tostring_char(lexer));
         case ']': return lexer_op(lexer, TOKEN_RSQUARE, lexer_tostring_char(lexer));
         case '.': return lexer_op(lexer, TOKEN_DOT, lexer_tostring_char(lexer));
+        case ':': return lexer_op(lexer, TOKEN_COLON, lexer_tostring_char(lexer));
         case ';': return lexer_op(lexer, TOKEN_ENDLINE, lexer_tostring_char(lexer));
         case ',': return lexer_op(lexer, TOKEN_COMMA, lexer_tostring_char(lexer));
     }
@@ -228,6 +229,12 @@ struct token* lexer_keyword(struct lexer* lexer)
         return token_create(TOKEN_CONTINUE, keyword, lexer->line);
     else if(strcmp(keyword, "return") == 0)
         return token_create(TOKEN_RETURN, keyword, lexer->line);
+    else if(strcmp(keyword, "num") == 0)
+        return token_create(TOKEN_TYPE_NUM, keyword, lexer->line);
+    else if(strcmp(keyword, "bool") == 0)
+        return token_create(TOKEN_TYPE_BOOL, keyword, lexer->line);
+    else if(strcmp(keyword, "str") == 0)
+        return token_create(TOKEN_TYPE_STRING, keyword, lexer->line);
 
     return token_create(TOKEN_ID, keyword, lexer->line);
 }
@@ -256,8 +263,11 @@ struct token* lexer_string(struct lexer* lexer)
 
 struct token* lexer_handle_minus(struct lexer* lexer)
 {
-    if(lexer->content[lexer->pos+1] == '=')
+    lexer_advance(lexer);
+    if(lexer->content[lexer->pos] == '=')
         return lexer_op(lexer, TOKEN_MINUSEQUAL, "-=");
+    else if(lexer->content[lexer->pos] == '>')
+        return lexer_op(lexer, TOKEN_ARROW, "->");
 
     return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));
 }

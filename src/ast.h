@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include "token.h"
 
+enum type { NUM, BOOL, STRING, VOID };
+
 enum ast_type
 {
     VARDECL, FUNDECL,
@@ -37,13 +39,14 @@ struct ast_node
 struct ast_function
 {
     struct token name;
-    struct token_list* params;
+    struct ast_list* params;
+    enum type return_type;
     struct ast_list* body;
 };
 
 struct ast_vardecl
 {
-    struct token name;
+    struct ast_node* var;
     struct ast_node* initializer;
 };
 
@@ -104,20 +107,20 @@ struct ast_call
     struct ast_list* arguments;
 };
 
-enum literal_type { INT, BOOL, STRING };
 struct ast_literal
 {
-    enum literal_type literal_type;
+    enum type literal_type;
     struct token value;
 };
 
 struct ast_variable
 {
     struct token name;
+    enum type type;
 };
 
-struct ast_node* ast_function(struct token name, struct token_list* params, struct ast_list* body);
-struct ast_node* ast_vardecl(struct token name, struct ast_node* initializer);
+struct ast_node* ast_function(struct token name, struct ast_list* params, int type, struct ast_list* body);
+struct ast_node* ast_vardecl(struct ast_node* var, struct ast_node* initializer);
 struct ast_node* ast_loop(struct ast_node* condition, struct ast_node* body);
 struct ast_node* ast_if(struct ast_node* condition, struct ast_node* then, struct ast_node* _else);
 struct ast_node* ast_break();

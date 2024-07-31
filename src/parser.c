@@ -80,6 +80,48 @@ struct token* consume(struct parser* parser, int type)
     error(parser);
 }
 
+static void set_var_type(struct parser* parser, struct ast_node* var)
+{
+    struct token* type = NULL;
+    
+    if(check(parser, TOKEN_TYPE_NUM))
+        type = consume(parser, TOKEN_TYPE_NUM);
+    else if(check(parser, TOKEN_TYPE_BOOL))
+        type = consume(parser, TOKEN_TYPE_BOOL);
+    else if(check(parser, TOKEN_TYPE_STRING))
+        type = consume(parser, TOKEN_TYPE_STRING);
+    else error(parser);
+
+    switch(type->type)
+    {
+        case TOKEN_TYPE_NUM: var->variable->type = NUM; break;
+        case TOKEN_TYPE_BOOL: var->variable->type = BOOL; break;
+        case TOKEN_TYPE_STRING: var->variable->type = STRING; break;
+    }
+}
+
+static int get_func_type(struct parser* parser)
+{
+    consume(parser, TOKEN_ARROW);
+
+    struct token* type = NULL;
+    if(check(parser, TOKEN_TYPE_NUM))
+        type = consume(parser, TOKEN_TYPE_NUM);
+    else if(check(parser, TOKEN_TYPE_BOOL))
+        type = consume(parser, TOKEN_TYPE_BOOL);
+    else if(check(parser, TOKEN_TYPE_STRING))
+        type = consume(parser, TOKEN_TYPE_STRING);
+    else error(parser);
+
+    switch(type->type)
+    {
+        case TOKEN_TYPE_NUM: return NUM;
+        case TOKEN_TYPE_BOOL: return BOOL;
+        case TOKEN_TYPE_STRING: return STRING;
+        default: return VOID;
+    }
+}
+
 struct ast_node* decl(struct parser* parser)
 {
     if(at_end(parser))
@@ -96,31 +138,49 @@ struct ast_node* fundecl(struct parser* parser)
 {
     struct token* name = consume(parser, TOKEN_ID);
     consume(parser, TOKEN_LPAREN);
-    struct token_list* params = token_list_init();
+    struct ast_list* params = ast_list_init();
     if(!check(parser, TOKEN_RPAREN))
     {
         do
         {
-            token_list_add(params, consume(parser, TOKEN_ID));
+            struct ast_node* var = primary(parser);
+            if(var->type != VARIABLE)
+                error(parser);
+
+            consume(parser, TOKEN_COLON);
+            set_var_type(parser, var);
+            ast_list_add(params, var);
         }
         while(match(parser, TOKEN_COMMA));
     }
     
     consume(parser, TOKEN_RPAREN);
+
+    int type;
+    if(check(parser, TOKEN_ARROW))
+        type = get_func_type(parser);
+    else type = VOID;
+
     consume(parser, TOKEN_LBRACE);
     struct ast_node* body = block(parser);
-    return ast_function(*name, params, body->block->statements);
+    return ast_function(*name, params, type, body->block->statements);
 }
 
 struct ast_node* vardecl(struct parser* parser)
 {
-    struct token* name = consume(parser, TOKEN_ID);
+    struct ast_node* var = primary(parser);
+    if(var->type != VARIABLE)
+        error(parser);
+
+    consume(parser, TOKEN_COLON);
+    set_var_type(parser, var);
+
     struct ast_node* initializer = NULL;
     if(match(parser, TOKEN_ASSIGN))
         initializer = bool(parser);
     
     consume(parser, TOKEN_ENDLINE);
-    return ast_vardecl(*name, initializer);
+    return ast_vardecl(var, initializer);
 }
 
 struct ast_node* stmt(struct parser* parser)
@@ -401,7 +461,7 @@ struct ast_node* primary(struct parser* parser)
     struct token* token = peek(parser);
     if(match(parser, TOKEN_NUM))
     {
-        return ast_literal(INT, *token);
+        return ast_literal(NUM, *token);
     }
     else if(match(parser, TOKEN_ID))
     {

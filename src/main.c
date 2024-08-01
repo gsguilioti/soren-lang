@@ -75,7 +75,6 @@ int main(int argc, char* argv[])
     struct ast_node* statement = decl(parser);
     while(statement != NULL)
     {
-        //print_ast(statement, 0, 0);
         statement = decl(parser);
     }
     printf("\n");

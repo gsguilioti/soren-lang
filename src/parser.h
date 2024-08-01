@@ -11,6 +11,8 @@ struct parser
     unsigned int pos;
 };
 
+struct ast_list* parse(struct parser* parser);
+
 struct parser* parser_init(struct token_list* list);
 int match(struct parser* parser, int type);
 int check(struct parser* parser, int type);

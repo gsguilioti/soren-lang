@@ -122,6 +122,15 @@ static int get_func_type(struct parser* parser)
     }
 }
 
+struct ast_list* parse(struct parser* parser)
+{
+    struct ast_list* statements = ast_list_init();
+    while(!at_end(parser))
+        ast_list_add(statements, decl(parser));
+
+    return statements;
+}
+
 struct ast_node* decl(struct parser* parser)
 {
     if(at_end(parser))
@@ -131,7 +140,7 @@ struct ast_node* decl(struct parser* parser)
     else if(match(parser, TOKEN_FUNCTION))
         return fundecl(parser);
 
-    error(parser);
+    return stmt(parser);
 }
 
 struct ast_node* fundecl(struct parser* parser)

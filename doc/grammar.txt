@@ -2,6 +2,7 @@ program         -> {decl} $
 
 decl            -> vardecl
                  | fundecl
+                 | stmt
                  
 fundecl         -> FN ID '(' ( id_type ( {',' id_type} ) ) ')' ( '->' type ) block
 

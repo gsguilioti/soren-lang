@@ -5,6 +5,7 @@
 #include "token.h"
 #include "lexer.h"
 #include "parser.h"
+#include "interpreter.h"
 #include "ast.h"
 
 char* read_file(char* filename)
@@ -72,11 +73,10 @@ int main(int argc, char* argv[])
     print_tokens(lexer_read(lexer));
     
     struct parser* parser = parser_init(lexer_read(lexer));
-    struct ast_node* statement = decl(parser);
-    while(statement != NULL)
-    {
-        statement = decl(parser);
-    }
+    struct ast_list* statements = parse(parser);
+
+    struct interpreter* interpreter = interpreter_init();
+    interpret(interpreter, statements);
     printf("\n");
 
     return 0;

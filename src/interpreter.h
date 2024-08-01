@@ -9,7 +9,8 @@ struct interpreter
 };
 
 struct interpreter* interpreter_init();
-void interpret(struct interpreter* interpreter, struct ast_node* node);
+void interpret(struct interpreter* interpreter, struct ast_list* statements);
+void execute(struct interpreter* interpreter, struct ast_node* statements);
 
 void visit_function(struct visitor* v, struct ast_function* node);
 void visit_vardecl(struct visitor* v, struct ast_vardecl* node);

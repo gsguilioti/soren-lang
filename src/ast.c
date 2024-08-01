@@ -193,3 +193,22 @@ void ast_list_add(struct ast_list* list, struct ast_node* node)
     list->size += 1;
     return;
 }
+
+struct ast_node* ast_list_at(struct ast_list* list, int index)
+{
+    if(list->head == NULL)
+        return NULL;
+
+    if(index == 0)
+        return list->head->value;
+    
+    struct ast_list_node* aux = list->head;
+    int i = 0;
+    while(i < index)
+    {
+        aux = aux->next;
+        i += 1;
+    }
+
+    return aux->value;
+}

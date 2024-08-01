@@ -155,5 +155,6 @@ struct ast_list
 
 struct ast_list* ast_list_init();
 void ast_list_add(struct ast_list* list, struct ast_node* token);
+struct ast_node* ast_list_at(struct ast_list* list, int index);
 
 #endif

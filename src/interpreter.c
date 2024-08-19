@@ -9,6 +9,10 @@ struct interpreter* interpreter_init()
     struct interpreter* interpreter = malloc(sizeof(struct interpreter));
     struct visitor* visitor = malloc(sizeof(struct visitor));
 
+    struct scope* global = scope_init();
+    struct scope* environment = scope_init();
+    scope_copy(global, environment);
+
     interpreter->v = visitor;
 
     interpreter->v->visit_function = visit_function;
@@ -33,10 +37,10 @@ struct interpreter* interpreter_init()
 void interpret(struct interpreter* interpreter, struct ast_list* statements)
 {
     for(int i = 0; i < statements->size; ++i)
-        execute(interpreter, ast_list_at(statements, i));
+        evaluate(interpreter, ast_list_at(statements, i));
 }
 
-void execute(struct interpreter* interpreter, struct ast_node* node)
+void evaluate(struct interpreter* interpreter, struct ast_node* node)
 {
     if(!node) return;
 
@@ -62,77 +66,77 @@ void execute(struct interpreter* interpreter, struct ast_node* node)
     }
 }
 
-void visit_function(struct visitor* v, struct ast_function* node)
+any visit_function(struct visitor* v, struct ast_function* node)
 {
     printf("visit_function\n");
 }
 
-void visit_vardecl(struct visitor* v, struct ast_vardecl* node)
+any visit_vardecl(struct visitor* v, struct ast_vardecl* node)
 {
     printf("visit_vardecl\n");
 }
 
-void visit_loop(struct visitor* v, struct ast_loop* node)
+any visit_loop(struct visitor* v, struct ast_loop* node)
 {
     printf("visit_loop\n");
 }
 
-void visit_if(struct visitor* v, struct ast_if* node)
-{   
+any visit_if(struct visitor* v, struct ast_if* node)
+{
     printf("visit_if\n");
 }
 
-void visit_break(struct visitor* v)
+any visit_break(struct visitor* v)
 {
     printf("visit_break\n");
 }
 
-void visit_continue(struct visitor* v)
+any visit_continue(struct visitor* v)
 {
     printf("visit_continue\n");
 }
 
-void visit_assign(struct visitor* v, struct ast_assign* node)
+any visit_assign(struct visitor* v, struct ast_assign* node)
 {
     printf("visit_assign\n");
 }
 
-void visit_return(struct visitor* v, struct ast_return* node)
+any visit_return(struct visitor* v, struct ast_return* node)
 {
     printf("visit_return\n");
 }
 
-void visit_block(struct visitor* v, struct ast_block* node)
+any visit_block(struct visitor* v, struct ast_block* node)
 {
     printf("visit_block\n");
 }
 
-void visit_unary(struct visitor* v, struct ast_unary* node)
+any visit_unary(struct visitor* v, struct ast_unary* node)
 {
     printf("visit_unary\n");
 }
 
-void visit_binary(struct visitor* v, struct ast_binary* node)
+any visit_binary(struct visitor* v, struct ast_binary* node)
 {
     printf("visit_binary\n");
 }
 
-void visit_logical(struct visitor* v, struct ast_logical* node)
+any visit_logical(struct visitor* v, struct ast_logical* node)
 {
     printf("visit_logical\n");
 }
 
-void visit_literal(struct visitor* v, struct ast_literal* node)
+any visit_literal(struct visitor* v, struct ast_literal* node)
 {
     printf("visit_literal\n");
 }
 
-void visit_variable(struct visitor* v, struct ast_variable* node)
+any visit_variable(struct visitor* v, struct ast_variable* node)
 {
     printf("visit_variable\n");
 }
 
-void visit_call(struct visitor* v, struct ast_call* node)
+any visit_call(struct visitor* v, struct ast_call* node)
 {
     printf("visit_call\n");
 }

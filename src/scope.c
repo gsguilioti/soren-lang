@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "scope.h"
 
 struct scope* scope_init()
@@ -46,7 +47,8 @@ void scope_set(struct scope* scope, char* key, any value)
         new->next = NULL;
         new->key = key;
         new->value = value;
-        aux = new;
+        scope->values->head = new;
+        scope->values->size += 1;
         return;
     }
 
@@ -67,6 +69,7 @@ void scope_set(struct scope* scope, char* key, any value)
     new->value = value;
 
     aux->next = new;
+    scope->values->size += 1;
 }
 
 any scope_get(struct scope* scope, char* key)

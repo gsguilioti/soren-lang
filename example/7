@@ -1,3 +1,4 @@
-
-    var a: num = 2;
+var a: num = 2;
+{
     var b: num = a;
+}

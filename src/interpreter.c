@@ -6,6 +6,93 @@
 #include <stdio.h>
 #include <string.h>
 
+struct interpreter* interpreter_init()
+{
+    struct interpreter* interpreter = malloc(sizeof(struct interpreter));
+    struct visitor* visitor = malloc(sizeof(struct visitor));
+
+    struct scope* global = scope_init();
+    interpreter->environment = global;
+
+    interpreter->v = visitor;
+
+    interpreter->v->visit_function = visit_function;
+    interpreter->v->visit_vardecl = visit_vardecl;
+    interpreter->v->visit_loop = visit_loop;
+    interpreter->v->visit_if = visit_if;
+    interpreter->v->visit_break = visit_break;
+    interpreter->v->visit_continue = visit_continue;
+    interpreter->v->visit_assign = visit_assign;
+    interpreter->v->visit_return = visit_return;
+    interpreter->v->visit_block = visit_block;
+    interpreter->v->visit_unary = visit_unary;
+    interpreter->v->visit_binary = visit_binary;
+    interpreter->v->visit_logical = visit_logical;
+    interpreter->v->visit_literal = visit_literal;
+    interpreter->v->visit_variable = visit_variable;
+    interpreter->v->visit_call = visit_call;
+
+    return interpreter;
+}
+
+void interpret(struct interpreter* interpreter, struct ast_list* statements)
+{
+    for(int i = 0; i < statements->size; ++i)
+        evaluate(interpreter, ast_list_at(statements, i));
+}
+
+void execute(struct interpreter* interpreter, struct ast_node* node)
+{
+    if(!node) return;
+
+    switch(node->type)
+    {
+        case VARDECL:   interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
+        case FUNDECL:   interpreter->v->visit_function(interpreter, node->function);  break;
+        case ASSIGN:    interpreter->v->visit_assign(interpreter, node->assign);      break;
+        case BLOCK:     interpreter->v->visit_block(interpreter, node->block);        break;
+        case IF:        interpreter->v->visit_if(interpreter, node->_if);             break;
+        case LOOP:      interpreter->v->visit_loop(interpreter, node->loop);          break;
+        case RETURN:    interpreter->v->visit_return(interpreter, node->_return);     break;
+        case BREAK:     interpreter->v->visit_break(interpreter);                     break;
+        case CONTINUE:  interpreter->v->visit_continue(interpreter);                  break;
+        case BINARY:    interpreter->v->visit_binary(interpreter, node->binary);      break;
+        case LOGICAL:   interpreter->v->visit_logical(interpreter, node->logical);    break;
+        case UNARY:     interpreter->v->visit_unary(interpreter, node->unary);        break;
+        case LITERAL:   interpreter->v->visit_literal(interpreter, node->literal);    break;
+        case VARIABLE:  interpreter->v->visit_variable(interpreter, node->variable);  break;
+        case CALL:      interpreter->v->visit_call(interpreter, node->call);          break;
+        default:
+            exit(1);
+    }
+}
+
+any evaluate(struct interpreter* interpreter, struct ast_node* node)
+{
+    if(!node) return;
+
+    switch(node->type)
+    {
+        case VARDECL:   return interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
+        case FUNDECL:   return interpreter->v->visit_function(interpreter, node->function);  break;
+        case ASSIGN:    return interpreter->v->visit_assign(interpreter, node->assign);      break;
+        case BLOCK:     return interpreter->v->visit_block(interpreter, node->block);        break;
+        case IF:        return interpreter->v->visit_if(interpreter, node->_if);             break;
+        case LOOP:      return interpreter->v->visit_loop(interpreter, node->loop);          break;
+        case RETURN:    return interpreter->v->visit_return(interpreter, node->_return);     break;
+        case BREAK:     return interpreter->v->visit_break(interpreter);                     break;
+        case CONTINUE:  return interpreter->v->visit_continue(interpreter);                  break;
+        case BINARY:    return interpreter->v->visit_binary(interpreter, node->binary);      break;
+        case LOGICAL:   return interpreter->v->visit_logical(interpreter, node->logical);    break;
+        case UNARY:     return interpreter->v->visit_unary(interpreter, node->unary);        break;
+        case LITERAL:   return interpreter->v->visit_literal(interpreter, node->literal);    break;
+        case VARIABLE:  return interpreter->v->visit_variable(interpreter, node->variable);  break;
+        case CALL:      return interpreter->v->visit_call(interpreter, node->call);          break;
+        default:
+            exit(1);
+    }
+}
+
 static int is_truthy(any object)
 {
     if(object.type == VOID) return 0;
@@ -131,94 +218,6 @@ static any solve_unary(enum token_type op, any right)
     }
 
     return value;
-}
-
-struct interpreter* interpreter_init()
-{
-    struct interpreter* interpreter = malloc(sizeof(struct interpreter));
-    struct visitor* visitor = malloc(sizeof(struct visitor));
-
-    struct scope* global = scope_init();
-    struct scope* environment = scope_init();
-    scope_copy(global, environment);
-
-    interpreter->v = visitor;
-
-    interpreter->v->visit_function = visit_function;
-    interpreter->v->visit_vardecl = visit_vardecl;
-    interpreter->v->visit_loop = visit_loop;
-    interpreter->v->visit_if = visit_if;
-    interpreter->v->visit_break = visit_break;
-    interpreter->v->visit_continue = visit_continue;
-    interpreter->v->visit_assign = visit_assign;
-    interpreter->v->visit_return = visit_return;
-    interpreter->v->visit_block = visit_block;
-    interpreter->v->visit_unary = visit_unary;
-    interpreter->v->visit_binary = visit_binary;
-    interpreter->v->visit_logical = visit_logical;
-    interpreter->v->visit_literal = visit_literal;
-    interpreter->v->visit_variable = visit_variable;
-    interpreter->v->visit_call = visit_call;
-
-    return interpreter;
-}
-
-void interpret(struct interpreter* interpreter, struct ast_list* statements)
-{
-    for(int i = 0; i < statements->size; ++i)
-        evaluate(interpreter, ast_list_at(statements, i));
-}
-
-void execute(struct interpreter* interpreter, struct ast_node* node)
-{
-    if(!node) return;
-
-    switch(node->type)
-    {
-        case VARDECL:   interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
-        case FUNDECL:   interpreter->v->visit_function(interpreter, node->function);  break;
-        case ASSIGN:    interpreter->v->visit_assign(interpreter, node->assign);      break;
-        case BLOCK:     interpreter->v->visit_block(interpreter, node->block);        break;
-        case IF:        interpreter->v->visit_if(interpreter, node->_if);             break;
-        case LOOP:      interpreter->v->visit_loop(interpreter, node->loop);          break;
-        case RETURN:    interpreter->v->visit_return(interpreter, node->_return);     break;
-        case BREAK:     interpreter->v->visit_break(interpreter);                     break;
-        case CONTINUE:  interpreter->v->visit_continue(interpreter);                  break;
-        case BINARY:    interpreter->v->visit_binary(interpreter, node->binary);      break;
-        case LOGICAL:   interpreter->v->visit_logical(interpreter, node->logical);    break;
-        case UNARY:     interpreter->v->visit_unary(interpreter, node->unary);        break;
-        case LITERAL:   interpreter->v->visit_literal(interpreter, node->literal);    break;
-        case VARIABLE:  interpreter->v->visit_variable(interpreter, node->variable);  break;
-        case CALL:      interpreter->v->visit_call(interpreter, node->call);          break;
-        default:
-            exit(1);
-    }
-}
-
-any evaluate(struct interpreter* interpreter, struct ast_node* node)
-{
-    if(!node) return;
-
-    switch(node->type)
-    {
-        case VARDECL:   return interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
-        case FUNDECL:   return interpreter->v->visit_function(interpreter, node->function);  break;
-        case ASSIGN:    return interpreter->v->visit_assign(interpreter, node->assign);      break;
-        case BLOCK:     return interpreter->v->visit_block(interpreter, node->block);        break;
-        case IF:        return interpreter->v->visit_if(interpreter, node->_if);             break;
-        case LOOP:      return interpreter->v->visit_loop(interpreter, node->loop);          break;
-        case RETURN:    return interpreter->v->visit_return(interpreter, node->_return);     break;
-        case BREAK:     return interpreter->v->visit_break(interpreter);                     break;
-        case CONTINUE:  return interpreter->v->visit_continue(interpreter);                  break;
-        case BINARY:    return interpreter->v->visit_binary(interpreter, node->binary);      break;
-        case LOGICAL:   return interpreter->v->visit_logical(interpreter, node->logical);    break;
-        case UNARY:     return interpreter->v->visit_unary(interpreter, node->unary);        break;
-        case LITERAL:   return interpreter->v->visit_literal(interpreter, node->literal);    break;
-        case VARIABLE:  return interpreter->v->visit_variable(interpreter, node->variable);  break;
-        case CALL:      return interpreter->v->visit_call(interpreter, node->call);          break;
-        default:
-            exit(1);
-    }
 }
 
 any visit_function(struct interpreter* i, struct ast_function* node)

@@ -228,17 +228,34 @@ any visit_function(struct interpreter* i, struct ast_function* node)
 
 any visit_vardecl(struct interpreter* i, struct ast_vardecl* node)
 {
-    printf("visit_vardecl\n");
+    any value;
+    if(node->initializer != NULL)
+        value = evaluate(i, node->initializer);
+
+    scope_set(i->environment, node->var->variable->name.lexeme, value);
+    
+    any empty = { .type = VOID};
+    return empty;
 }
 
 any visit_loop(struct interpreter* i, struct ast_loop* node)
 {
-    printf("visit_loop\n");
+    while(is_truthy(evaluate(i, node->condition)))
+        execute(i, node->body);
+
+    any value = { .type = VOID};
+    return value;
 }
 
 any visit_if(struct interpreter* i, struct ast_if* node)
 {
-    printf("visit_if\n");
+    if(is_truthy(evaluate(i, node->condition)))
+        execute(i, node->then);
+    else if(node->_else != NULL)
+        execute(i, node->_else);
+
+    any value = { .type = VOID};
+    return value;
 }
 
 any visit_break(struct interpreter* i)
@@ -253,7 +270,10 @@ any visit_continue(struct interpreter* i)
 
 any visit_assign(struct interpreter* i, struct ast_assign* node)
 {
-    printf("visit_assign\n");
+    any value = evaluate(i, node->value);
+    scope_set(i->environment, node->name.lexeme, value);
+
+    return value;
 }
 
 any visit_return(struct interpreter* i, struct ast_return* node)
@@ -296,7 +316,14 @@ any visit_binary(struct interpreter* i, struct ast_binary* node)
 
 any visit_logical(struct interpreter* i, struct ast_logical* node)
 {
-    printf("visit_logical\n");
+    any left = evaluate(i, node->left);
+
+    if(node->op.type == TOKEN_OR)
+        if(is_truthy(left)) return left;
+    else
+        if(!is_truthy(left)) return left;
+
+    return evaluate(i, node->right);
 }
 
 any visit_literal(struct interpreter* i, struct ast_literal* node)
@@ -306,7 +333,7 @@ any visit_literal(struct interpreter* i, struct ast_literal* node)
 
 any visit_variable(struct interpreter* i, struct ast_variable* node)
 {
-    printf("visit variable");
+    return scope_get(i->environment, node->name.lexeme);
 }
 
 any visit_call(struct interpreter* i, struct ast_call* node)

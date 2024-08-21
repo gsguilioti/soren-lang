@@ -46,6 +46,7 @@ void scope_set(struct scope* scope, char* key, any value)
         new->next = NULL;
         new->key = key;
         new->value = value;
+        aux = new;
         return;
     }
 

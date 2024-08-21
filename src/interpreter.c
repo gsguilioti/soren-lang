@@ -1,16 +1,116 @@
 #include "interpreter.h"
 #include "visitor.h"
+#include "enums.h"
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+static int is_truthy(any object)
+{
+    if(object.type == VOID) return 0;
+    if(object.type == BOOL) return object.bool;
+
+    return 1;
+}
+
+static int is_equal(any first, any second)
+{
+    if(first.type == NUM)
+    {
+        if(second.type != NUM)
+            return 0;
+        
+        return first.num == second.num;
+    }
+    else if(first.type == BOOL)
+    {
+        if(second.type != BOOL)
+            return 0;
+
+        return first.bool == second.bool;
+    }
+    else if(first.type == STRING)
+    {
+        if(second.type != STRING)
+            return 0;
+
+        return !strcmp(first.string, second.string);
+    }
+
+    return 0;
+}
+
+static void validate_unary(any operand)
+{
+    if(operand.type == NUM) return;
+
+    printf("Operand must be a number.\n");
+    exit(1);
+}
 
 static void validate_binary(any left, any right)
 {
-    if(left.type == NUM && right.type != NUM)
+    if(left.type == NUM && right.type == NUM) return;
+
+    printf("Operands must be a number.\n");
+    exit(1);
+}
+
+static any solve_binary(enum token_type op, any left, any right)
+{
+    any value;
+    value.type = VOID;
+
+    switch(op)
     {
-        printf("invalid operation.");
-        exit(1);
+        case TOKEN_GREAT:
+            value.type = BOOL;
+            value.bool = left.num > right.num;
+            break;
+        case TOKEN_LESS:
+            value.type = BOOL;
+            value.bool = left.num < right.num;
+            break;
+        case TOKEN_GTHEN:
+            value.type = BOOL;
+            value.bool = left.num >= right.num;
+            break;
+        case TOKEN_LTHEN:
+            value.type = BOOL;
+            value.bool = left.num <= right.num;
+            break;
+        case TOKEN_EQUAL:
+            value.type = BOOL;
+            value.bool = is_equal(left, right);
+            break;
+        case TOKEN_NOTEQUAL:
+            value.type = BOOL;
+            value.bool = !is_equal(left, right);
+            break;
+        case TOKEN_PLUS:
+            value.type = NUM;
+            value.num = left.num + right.num;
+            break;
+        case TOKEN_MINUS:
+            value.type = NUM;
+            value.num = left.num - right.num;
+            break;
+        case TOKEN_MULT:
+            value.type = NUM;
+            value.num = left.num * right.num;
+            break;
+        case TOKEN_DIV:
+            value.type = NUM;
+            value.num = left.num / right.num;
+            break;
+        case TOKEN_MOD:
+            value.type = NUM;
+            value.num = (int)left.num % (int)right.num;
+            break;
     }
+
+    return value;
 }
 
 struct interpreter* interpreter_init()
@@ -167,32 +267,8 @@ any visit_binary(struct interpreter* i, struct ast_binary* node)
     any left = evaluate(i, node->left);
     any right = evaluate(i, node->right);
 
-    switch(node->op.type)
-    {
-        case TOKEN_GREAT:
-            break;
-        case TOKEN_LESS:
-            break;
-        case TOKEN_GTHEN:
-            break;
-        case TOKEN_LTHEN:
-            break;
-        case TOKEN_EQUAL:
-            break;
-        case TOKEN_NOTEQUAL:
-            break;
-        case TOKEN_PLUS:
-            validate_binary(left, right);
-            break;
-        case TOKEN_MINUS:
-            break;
-        case TOKEN_MULT:
-            break;
-        case TOKEN_DIV:
-            break;
-        case TOKEN_MOD:
-            break;
-    }
+    validate_binary(left, right);
+    return solve_binary(node->op.type, left, right);
 }
 
 any visit_logical(struct interpreter* i, struct ast_logical* node)

@@ -263,10 +263,9 @@ struct token* lexer_string(struct lexer* lexer)
 
 struct token* lexer_handle_minus(struct lexer* lexer)
 {
-    lexer_advance(lexer);
-    if(lexer->content[lexer->pos] == '=')
+    if(lexer->content[lexer->pos+1] == '=')
         return lexer_op(lexer, TOKEN_MINUSEQUAL, "-=");
-    else if(lexer->content[lexer->pos] == '>')
+    else if(lexer->content[lexer->pos+1] == '>')
         return lexer_op(lexer, TOKEN_ARROW, "->");
 
     return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));

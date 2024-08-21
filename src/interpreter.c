@@ -113,6 +113,26 @@ static any solve_binary(enum token_type op, any left, any right)
     return value;
 }
 
+static any solve_unary(enum token_type op, any right)
+{
+    any value;
+    value.type = VOID;
+
+    switch(op)
+    {
+        case TOKEN_NOT:
+            value.type = BOOL;
+            value.bool = !is_truthy(right);
+            break;
+        case TOKEN_MINUS:
+            value.type = NUM;
+            value.num = -right.num;
+            break;
+    }
+
+    return value;
+}
+
 struct interpreter* interpreter_init()
 {
     struct interpreter* interpreter = malloc(sizeof(struct interpreter));
@@ -259,7 +279,10 @@ any visit_block(struct interpreter* i, struct ast_block* node)
 
 any visit_unary(struct interpreter* i, struct ast_unary* node)
 {
-    printf("visit_unary\n");
+    any right = evaluate(i, node->right);
+
+    validate_unary(right);
+    return solve_unary(node->op.type, right);
 }
 
 any visit_binary(struct interpreter* i, struct ast_binary* node)
@@ -283,7 +306,7 @@ any visit_literal(struct interpreter* i, struct ast_literal* node)
 
 any visit_variable(struct interpreter* i, struct ast_variable* node)
 {
-    printf("visit_variable\n");
+    printf("visit variable");
 }
 
 any visit_call(struct interpreter* i, struct ast_call* node)

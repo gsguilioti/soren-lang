@@ -3,8 +3,8 @@
 
 #include <stdlib.h>
 #include "token.h"
-
-enum type { NUM, BOOL, STRING, VOID };
+#include "any.h"
+#include "enums.h"
 
 enum ast_type
 {
@@ -110,7 +110,7 @@ struct ast_call
 struct ast_literal
 {
     enum type literal_type;
-    struct token value;
+    any value;
 };
 
 struct ast_variable

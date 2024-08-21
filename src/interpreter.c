@@ -4,6 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static void validate_binary(any left, any right)
+{
+    if(left.type == NUM && right.type != NUM)
+    {
+        printf("invalid operation.");
+        exit(1);
+    }
+}
+
 struct interpreter* interpreter_init()
 {
     struct interpreter* interpreter = malloc(sizeof(struct interpreter));
@@ -40,103 +49,168 @@ void interpret(struct interpreter* interpreter, struct ast_list* statements)
         evaluate(interpreter, ast_list_at(statements, i));
 }
 
-void evaluate(struct interpreter* interpreter, struct ast_node* node)
+void execute(struct interpreter* interpreter, struct ast_node* node)
 {
     if(!node) return;
 
     switch(node->type)
     {
-        case VARDECL:   interpreter->v->visit_vardecl(interpreter->v, node->vardecl);    break;
-        case FUNDECL:   interpreter->v->visit_function(interpreter->v, node->function);  break;
-        case ASSIGN:    interpreter->v->visit_assign(interpreter->v, node->assign);      break;
-        case BLOCK:     interpreter->v->visit_block(interpreter->v, node->block);        break;
-        case IF:        interpreter->v->visit_if(interpreter->v, node->_if);             break;
-        case LOOP:      interpreter->v->visit_loop(interpreter->v, node->loop);          break;
-        case RETURN:    interpreter->v->visit_return(interpreter->v, node->_return);     break;
-        case BREAK:     interpreter->v->visit_break(interpreter->v);                     break;
-        case CONTINUE:  interpreter->v->visit_continue(interpreter->v);                  break;
-        case BINARY:    interpreter->v->visit_binary(interpreter->v, node->binary);      break;
-        case LOGICAL:   interpreter->v->visit_logical(interpreter->v, node->logical);    break;
-        case UNARY:     interpreter->v->visit_unary(interpreter->v, node->unary);        break;
-        case LITERAL:   interpreter->v->visit_literal(interpreter->v, node->literal);    break;
-        case VARIABLE:  interpreter->v->visit_variable(interpreter->v, node->variable);  break;
-        case CALL:      interpreter->v->visit_call(interpreter->v, node->call);          break;
+        case VARDECL:   interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
+        case FUNDECL:   interpreter->v->visit_function(interpreter, node->function);  break;
+        case ASSIGN:    interpreter->v->visit_assign(interpreter, node->assign);      break;
+        case BLOCK:     interpreter->v->visit_block(interpreter, node->block);        break;
+        case IF:        interpreter->v->visit_if(interpreter, node->_if);             break;
+        case LOOP:      interpreter->v->visit_loop(interpreter, node->loop);          break;
+        case RETURN:    interpreter->v->visit_return(interpreter, node->_return);     break;
+        case BREAK:     interpreter->v->visit_break(interpreter);                     break;
+        case CONTINUE:  interpreter->v->visit_continue(interpreter);                  break;
+        case BINARY:    interpreter->v->visit_binary(interpreter, node->binary);      break;
+        case LOGICAL:   interpreter->v->visit_logical(interpreter, node->logical);    break;
+        case UNARY:     interpreter->v->visit_unary(interpreter, node->unary);        break;
+        case LITERAL:   interpreter->v->visit_literal(interpreter, node->literal);    break;
+        case VARIABLE:  interpreter->v->visit_variable(interpreter, node->variable);  break;
+        case CALL:      interpreter->v->visit_call(interpreter, node->call);          break;
         default:
             exit(1);
     }
 }
 
-any visit_function(struct visitor* v, struct ast_function* node)
+any evaluate(struct interpreter* interpreter, struct ast_node* node)
+{
+    if(!node) return;
+
+    switch(node->type)
+    {
+        case VARDECL:   return interpreter->v->visit_vardecl(interpreter, node->vardecl);    break;
+        case FUNDECL:   return interpreter->v->visit_function(interpreter, node->function);  break;
+        case ASSIGN:    return interpreter->v->visit_assign(interpreter, node->assign);      break;
+        case BLOCK:     return interpreter->v->visit_block(interpreter, node->block);        break;
+        case IF:        return interpreter->v->visit_if(interpreter, node->_if);             break;
+        case LOOP:      return interpreter->v->visit_loop(interpreter, node->loop);          break;
+        case RETURN:    return interpreter->v->visit_return(interpreter, node->_return);     break;
+        case BREAK:     return interpreter->v->visit_break(interpreter);                     break;
+        case CONTINUE:  return interpreter->v->visit_continue(interpreter);                  break;
+        case BINARY:    return interpreter->v->visit_binary(interpreter, node->binary);      break;
+        case LOGICAL:   return interpreter->v->visit_logical(interpreter, node->logical);    break;
+        case UNARY:     return interpreter->v->visit_unary(interpreter, node->unary);        break;
+        case LITERAL:   return interpreter->v->visit_literal(interpreter, node->literal);    break;
+        case VARIABLE:  return interpreter->v->visit_variable(interpreter, node->variable);  break;
+        case CALL:      return interpreter->v->visit_call(interpreter, node->call);          break;
+        default:
+            exit(1);
+    }
+}
+
+any visit_function(struct interpreter* i, struct ast_function* node)
 {
     printf("visit_function\n");
 }
 
-any visit_vardecl(struct visitor* v, struct ast_vardecl* node)
+any visit_vardecl(struct interpreter* i, struct ast_vardecl* node)
 {
     printf("visit_vardecl\n");
 }
 
-any visit_loop(struct visitor* v, struct ast_loop* node)
+any visit_loop(struct interpreter* i, struct ast_loop* node)
 {
     printf("visit_loop\n");
 }
 
-any visit_if(struct visitor* v, struct ast_if* node)
+any visit_if(struct interpreter* i, struct ast_if* node)
 {
     printf("visit_if\n");
 }
 
-any visit_break(struct visitor* v)
+any visit_break(struct interpreter* i)
 {
     printf("visit_break\n");
 }
 
-any visit_continue(struct visitor* v)
+any visit_continue(struct interpreter* i)
 {
     printf("visit_continue\n");
 }
 
-any visit_assign(struct visitor* v, struct ast_assign* node)
+any visit_assign(struct interpreter* i, struct ast_assign* node)
 {
     printf("visit_assign\n");
 }
 
-any visit_return(struct visitor* v, struct ast_return* node)
+any visit_return(struct interpreter* i, struct ast_return* node)
 {
     printf("visit_return\n");
 }
 
-any visit_block(struct visitor* v, struct ast_block* node)
+any visit_block(struct interpreter* i, struct ast_block* node)
 {
-    printf("visit_block\n");
+    struct scope* prev = i->environment;
+    struct scope* env = scope_init();
+    scope_copy(prev, env);
+    i->environment = env;
+
+    for(int j = 0; j < node->statements->size; ++j)
+    {
+        execute(i, ast_list_at(node->statements, j));
+    }
+    
+    i->environment = prev;
+    free(env);
 }
 
-any visit_unary(struct visitor* v, struct ast_unary* node)
+any visit_unary(struct interpreter* i, struct ast_unary* node)
 {
     printf("visit_unary\n");
 }
 
-any visit_binary(struct visitor* v, struct ast_binary* node)
+any visit_binary(struct interpreter* i, struct ast_binary* node)
 {
-    printf("visit_binary\n");
+    any left = evaluate(i, node->left);
+    any right = evaluate(i, node->right);
+
+    switch(node->op.type)
+    {
+        case TOKEN_GREAT:
+            break;
+        case TOKEN_LESS:
+            break;
+        case TOKEN_GTHEN:
+            break;
+        case TOKEN_LTHEN:
+            break;
+        case TOKEN_EQUAL:
+            break;
+        case TOKEN_NOTEQUAL:
+            break;
+        case TOKEN_PLUS:
+            validate_binary(left, right);
+            break;
+        case TOKEN_MINUS:
+            break;
+        case TOKEN_MULT:
+            break;
+        case TOKEN_DIV:
+            break;
+        case TOKEN_MOD:
+            break;
+    }
 }
 
-any visit_logical(struct visitor* v, struct ast_logical* node)
+any visit_logical(struct interpreter* i, struct ast_logical* node)
 {
     printf("visit_logical\n");
 }
 
-any visit_literal(struct visitor* v, struct ast_literal* node)
+any visit_literal(struct interpreter* i, struct ast_literal* node)
 {
-    printf("visit_literal\n");
+    return node->value;
 }
 
-any visit_variable(struct visitor* v, struct ast_variable* node)
+any visit_variable(struct interpreter* i, struct ast_variable* node)
 {
     printf("visit_variable\n");
 }
 
-any visit_call(struct visitor* v, struct ast_call* node)
+any visit_call(struct interpreter* i, struct ast_call* node)
 {
     printf("visit_call\n");
 }

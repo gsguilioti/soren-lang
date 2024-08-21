@@ -1,6 +1,7 @@
 #ifndef SCOPE
 #define SCOPE
 
+#include <stdlib.h>
 #include "any.h"
 
 struct scope

@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include "ast.h"
 
 static struct ast_node* ast_node()
@@ -133,7 +135,30 @@ struct ast_node* ast_literal(int literal_type, struct token value)
     node->type = LITERAL;
     node->literal = (struct ast_literal*)malloc(sizeof(struct ast_literal));
     node->literal->literal_type = literal_type;
-    node->literal->value = value;
+
+    any _value;
+    switch (literal_type)
+    {
+        case NUM:
+            _value.type = NUM;
+            _value.num = atof(value.lexeme);
+            break;
+        case BOOL:
+            _value.type = BOOL;
+            if(strcmp(value.lexeme, "true") == 0)
+                _value.bool = 1;
+            else
+                _value.bool = 0;
+            break;
+        case STRING:
+            _value.type = STRING;
+            _value.string = value.lexeme;
+            break;
+        default:
+            break;
+    }
+
+    node->literal->value = _value;
     return node;
 }
 

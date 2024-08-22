@@ -222,7 +222,11 @@ static any solve_unary(enum token_type op, any right)
 
 any visit_function(struct interpreter* i, struct ast_function* node)
 {
-    printf("visit_function\n");
+    struct function* function = function_init(node, i->environment);
+    any value = { .type = FUNCTION, .function = function};
+    scope_define(i->environment, node->name.lexeme, value);
+
+    return value;
 }
 
 any visit_vardecl(struct interpreter* i, struct ast_vardecl* node)
@@ -231,7 +235,7 @@ any visit_vardecl(struct interpreter* i, struct ast_vardecl* node)
     if(node->initializer != NULL)
         value = evaluate(i, node->initializer);
 
-    scope_set(i->environment, node->var->variable->name.lexeme, value);
+    scope_assign(i->environment, node->var->variable->name.lexeme, value);
     
     any empty = { .type = VOID};
     return empty;
@@ -270,17 +274,29 @@ any visit_continue(struct interpreter* i)
 any visit_assign(struct interpreter* i, struct ast_assign* node)
 {
     any value = evaluate(i, node->value);
-    scope_set(i->environment, node->name.lexeme, value);
+    scope_assign(i->environment, node->name.lexeme, value);
 
     return value;
 }
 
 any visit_return(struct interpreter* i, struct ast_return* node)
 {
-    printf("visit_return\n");
+    any value;
+    if(node->value != NULL)
+        value = evaluate(i, node->value);
+
+    //lançar o retorno
 }
 
 any visit_block(struct interpreter* i, struct ast_block* node)
+{
+    execute_block(i, node);
+
+    any empty = { .type = VOID};
+    return empty;
+}
+
+void execute_block(struct interpreter* i, struct ast_block* node)
 {
     struct scope* prev = i->environment;
     struct scope* env = scope_init();
@@ -291,6 +307,8 @@ any visit_block(struct interpreter* i, struct ast_block* node)
     {
         execute(i, ast_list_at(node->statements, j));
     }
+
+    //capturar o retorno
     
     i->environment = prev;
     free(env);
@@ -337,5 +355,20 @@ any visit_variable(struct interpreter* i, struct ast_variable* node)
 
 any visit_call(struct interpreter* i, struct ast_call* node)
 {
-    printf("visit_call\n");
+    any callee = evaluate(i, node->calee);
+
+    struct any_list* arguments = any_list_init();
+    for(int i = 0; i < node->arguments->size; ++i)
+    {
+        switch (ast_list_at(node->arguments, i)->type)
+        {
+            case VARIABLE:
+                // I DONT KNOW HOW TO SOLVE THIS YET 
+                //any_list_add(arguments, ast_list_at(node->arguments, i)->variable);
+                break;
+            case LITERAL:
+                break;
+        }
+        
+    }
 }

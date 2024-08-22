@@ -32,12 +32,12 @@ void scope_copy(struct scope* parent, struct scope* scope)
     struct scope_node* aux = parent->values->head;
     while(aux != NULL)
     {
-        scope_set(scope, aux->key, aux->value);
+        scope_assign(scope, aux->key, aux->value);
         aux = aux->next;
     }
 }
 
-void scope_set(struct scope* scope, char* key, any value)
+void scope_define(struct scope* scope, char* key, any value)
 {
     struct scope_node* aux = scope->values->head;
 
@@ -70,6 +70,34 @@ void scope_set(struct scope* scope, char* key, any value)
 
     aux->next = new;
     scope->values->size += 1;
+}
+
+void scope_assign(struct scope* scope, char* key, any value)
+{
+    struct scope_node* aux = scope->values->head;
+
+    if(aux != NULL)
+    {
+        while(aux != NULL)
+        {
+            if(strcmp(aux->key, key) == 0)
+            {
+                aux->value = value;
+                return;
+            }
+
+            aux = aux->next;
+        }
+    }
+
+    if(scope->parent != NULL)
+    {
+        scope_assign(scope->parent, key, value);
+        return;
+    }
+
+    printf("Undefined variable '%s'\n", key);
+    exit(1);
 }
 
 any scope_get(struct scope* scope, char* key)

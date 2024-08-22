@@ -1,7 +1,7 @@
 #ifndef ENUMS
 #define ENUMS
 
-enum type { NUM, BOOL, STRING, VOID };
+enum type { NUM, BOOL, STRING, FUNCTION, VOID };
 
 enum token_type
 {

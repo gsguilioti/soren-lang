@@ -26,7 +26,8 @@ struct scope_node
 struct scope* scope_init();
 struct scope_list* scope_list_init();
 void scope_copy(struct scope* parent, struct scope* scope);
-void scope_set(struct scope* scope, char* key, any value);
+void scope_define(struct scope* scope, char* key, any value);
+void scope_assign(struct scope* scope, char* key, any value);
 any scope_get(struct scope* scope, char* key);
 
 #endif

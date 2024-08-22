@@ -1,6 +1,7 @@
 #include "interpreter.h"
 #include "visitor.h"
 #include "enums.h"
+#include "function.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -223,7 +224,7 @@ static any solve_unary(enum token_type op, any right)
 any visit_function(struct interpreter* i, struct ast_function* node)
 {
     struct function* function = function_init(node, i->environment);
-    any value = { .type = FUNCTION, .function = function};
+    any value = { .type = FUNC, .function = function};
     scope_define(i->environment, node->name.lexeme, value);
 
     return value;
@@ -235,7 +236,7 @@ any visit_vardecl(struct interpreter* i, struct ast_vardecl* node)
     if(node->initializer != NULL)
         value = evaluate(i, node->initializer);
 
-    scope_assign(i->environment, node->var->variable->name.lexeme, value);
+    scope_define(i->environment, node->var->variable->name.lexeme, value);
     
     any empty = { .type = VOID};
     return empty;

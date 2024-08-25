@@ -1,0 +1,6 @@
+fn test(a: num, b: num)
+{
+    a = 3;
+}
+
+test(2, 3);

@@ -291,28 +291,27 @@ any visit_return(struct interpreter* i, struct ast_return* node)
 
 any visit_block(struct interpreter* i, struct ast_block* node)
 {
-    execute_block(i, node);
+    struct scope* env = scope_init();
+    scope_copy(i->environment, env);
+    execute_block(i, node->statements, env);
 
     any empty = { .type = VOID};
     return empty;
 }
 
-void execute_block(struct interpreter* i, struct ast_block* node)
+void execute_block(struct interpreter* i, struct ast_list* statements, struct scope* environment)
 {
     struct scope* prev = i->environment;
-    struct scope* env = scope_init();
-    scope_copy(prev, env);
-    i->environment = env;
+    i->environment = environment;
 
-    for(int j = 0; j < node->statements->size; ++j)
+    for(int j = 0; j < statements->size; ++j)
     {
-        execute(i, ast_list_at(node->statements, j));
+        execute(i, ast_list_at(statements, j));
     }
 
     //capturar o retorno
     
     i->environment = prev;
-    free(env);
 }
 
 any visit_unary(struct interpreter* i, struct ast_unary* node)
@@ -354,22 +353,31 @@ any visit_variable(struct interpreter* i, struct ast_variable* node)
     return scope_get(i->environment, node->name.lexeme);
 }
 
-any visit_call(struct interpreter* i, struct ast_call* node)
+any visit_call(struct interpreter* interpreter, struct ast_call* node)
 {
-    any callee = evaluate(i, node->calee);
+    any callee = evaluate(interpreter, node->calee);
 
     struct any_list* arguments = any_list_init();
     for(int i = 0; i < node->arguments->size; ++i)
+        any_list_add(arguments, evaluate(interpreter, ast_list_at(node->arguments, i)));
+
+    struct function* function;
+
+    if(callee.type != FUNC)
     {
-        switch (ast_list_at(node->arguments, i)->type)
-        {
-            case VARIABLE:
-                // I DONT KNOW HOW TO SOLVE THIS YET 
-                //any_list_add(arguments, ast_list_at(node->arguments, i)->variable);
-                break;
-            case LITERAL:
-                break;
-        }
-        
+        printf("Can only call functions.\n");
+        exit(1);
     }
+    else
+    {
+        function = callee.function;
+    }
+
+    if(arguments->size != arity(function))
+    {
+        printf("Invalid number of arguments.\n");
+        exit(1);
+    }
+
+    return function->callfunc(function, interpreter, arguments);
 }

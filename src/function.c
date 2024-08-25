@@ -16,9 +16,9 @@ any callfunc(struct function* function, struct interpreter* interpreter, struct 
     scope_copy(function->closure, environment);
 
     for (int i = 0; i < function->declaration->params->size; ++i)
-        scope_assign(environment, ast_list_at(function->declaration->params, i)->variable->name.lexeme, any_list_at(arguments, i));
+        scope_define(environment, ast_list_at(function->declaration->params, i)->variable->name.lexeme, any_list_at(arguments, i));
     
-    //execute_block(interpreter, function->declaration->body);
+    execute_block(interpreter, function->declaration->body, environment);
     //capturar o retorno
     //retornar o retorno
 }

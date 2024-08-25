@@ -26,12 +26,12 @@ any visit_continue(struct interpreter* i);
 any visit_assign(struct interpreter* i, struct ast_assign* node);
 any visit_return(struct interpreter* i, struct ast_return* node);
 any visit_block(struct interpreter* i, struct ast_block* node);
-void execute_block(struct interpreter* i, struct ast_block* node);
+void execute_block(struct interpreter* i, struct ast_list* statements, struct scope* environment);
 any visit_unary(struct interpreter* i, struct ast_unary* node);
 any visit_binary(struct interpreter* i, struct ast_binary* node);
 any visit_logical(struct interpreter* i, struct ast_logical* node);
 any visit_literal(struct interpreter* i, struct ast_literal* node);
 any visit_variable(struct interpreter* i, struct ast_variable* node);
-any visit_call(struct interpreter* i, struct ast_call* node);
+any visit_call(struct interpreter* interpreter, struct ast_call* node);
 
 #endif

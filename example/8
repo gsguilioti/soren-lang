@@ -1,6 +1,6 @@
-fn test(a: num, b: num)
+fn add(a: num, b: num)
 {
-    a = 3;
+    return a + b;
 }
 
-test(2, 3);
+add(2, 3);

@@ -33,6 +33,8 @@ struct interpreter* interpreter_init()
     interpreter->v->visit_variable = visit_variable;
     interpreter->v->visit_call = visit_call;
 
+    interpreter->returning = 0;
+
     return interpreter;
 }
 
@@ -70,7 +72,8 @@ void execute(struct interpreter* interpreter, struct ast_node* node)
 
 any evaluate(struct interpreter* interpreter, struct ast_node* node)
 {
-    if(!node) return;
+    any empty = { .type = VOID};
+    if(!node) return empty;
 
     switch(node->type)
     {
@@ -282,11 +285,14 @@ any visit_assign(struct interpreter* i, struct ast_assign* node)
 
 any visit_return(struct interpreter* i, struct ast_return* node)
 {
-    any value;
+    any value = {.type = VOID};
     if(node->value != NULL)
         value = evaluate(i, node->value);
 
-    //lançar o retorno
+    i->retval = value;
+    i->returning = 1;
+
+    return value;
 }
 
 any visit_block(struct interpreter* i, struct ast_block* node)
@@ -307,9 +313,9 @@ void execute_block(struct interpreter* i, struct ast_list* statements, struct sc
     for(int j = 0; j < statements->size; ++j)
     {
         execute(i, ast_list_at(statements, j));
+        if(i->returning)
+            break;
     }
-
-    //capturar o retorno
     
     i->environment = prev;
 }

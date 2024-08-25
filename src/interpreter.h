@@ -10,6 +10,8 @@ struct interpreter
     struct visitor* v;
     struct scope* global;
     struct scope* environment;
+    any retval;
+    int returning; 
 };
 
 struct interpreter* interpreter_init();

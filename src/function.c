@@ -19,8 +19,14 @@ any callfunc(struct function* function, struct interpreter* interpreter, struct 
         scope_define(environment, ast_list_at(function->declaration->params, i)->variable->name.lexeme, any_list_at(arguments, i));
     
     execute_block(interpreter, function->declaration->body, environment);
-    //capturar o retorno
-    //retornar o retorno
+    if (interpreter->returning) 
+    {
+        interpreter->returning = 0;
+        return interpreter->retval;
+    }
+
+    any empty = { .type = VOID};
+    return empty;
 }
 
 int arity(struct function* function)

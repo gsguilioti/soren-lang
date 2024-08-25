@@ -56,8 +56,8 @@ void scope_define(struct scope* scope, char* key, any value)
     {
         if(strcmp(aux->key, key) == 0)
         {
-            aux->value = value;
-            return;
+            printf("Already defined: %s\n", key);
+            exit(1);
         }
 
         aux = aux->next;
@@ -116,7 +116,7 @@ any scope_get(struct scope* scope, char* key)
             return aux->value;
     }
 
-    while(aux->next != NULL)
+    while(aux != NULL)
     {
         if(strcmp(aux->key, key) == 0)
             return aux->value;

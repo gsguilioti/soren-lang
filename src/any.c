@@ -34,8 +34,9 @@ void any_list_add(struct any_list* list, any value)
 
 any any_list_at(struct any_list* list, int index)
 {
+    any empty = {.type = VOID};
     if(list->head == NULL)
-        return;
+        return empty;
 
     if(index == 0)
         return list->head->value;

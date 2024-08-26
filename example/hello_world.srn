@@ -1,4 +1,4 @@
-fn hello_world()
+fn hello_world() -> str
 {
     return 'Hello, world!';
 }

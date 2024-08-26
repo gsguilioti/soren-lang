@@ -120,6 +120,7 @@ static int is_truthy(any object)
 {
     if(object.type == VOID) return 0;
     if(object.type == BOOL) return object.bool;
+    if(object.type == NUM) return object.num;
 
     return 1;
 }
@@ -162,7 +163,6 @@ static void validate_unary(enum token_type op, any operand)
 
 static void validate_binary(enum token_type op, any left, any right)
 {
-    printf("op: %d\n", op);
     if(op == TOKEN_PLUS || op == TOKEN_MINUS || op == TOKEN_DIV || op == TOKEN_MULT || op == TOKEN_MOD)
     {
         if(left.type == NUM && right.type == NUM) return;

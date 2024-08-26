@@ -25,16 +25,6 @@ void scope_copy(struct scope* parent, struct scope* scope)
         return;
 
     scope->parent = parent;
-
-    if(parent->values->head == NULL)
-        return;
-
-    struct scope_node* aux = parent->values->head;
-    while(aux != NULL)
-    {
-        scope_define(scope, aux->key, aux->value);
-        aux = aux->next;
-    }
 }
 
 void scope_define(struct scope* scope, char* key, any value)
@@ -106,6 +96,10 @@ any scope_get(struct scope* scope, char* key)
 
     if(aux == NULL)
     {
+        if(scope->parent != NULL)
+        {
+            return scope_get(scope->parent, key);
+        }
         printf("Undefined variable '%s'\n", key);
         exit(1);
     }
@@ -122,6 +116,11 @@ any scope_get(struct scope* scope, char* key)
             return aux->value;
 
         aux = aux->next;
+    }
+
+    if(scope->parent != NULL)
+    {
+        return scope_get(scope->parent, key);
     }
 
     printf("Undefined variable '%s'\n", key);

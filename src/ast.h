@@ -6,15 +6,6 @@
 #include "any.h"
 #include "enums.h"
 
-enum ast_type
-{
-    VARDECL, FUNDECL,
-    ASSIGN, BLOCK, IF, LOOP,
-    RETURN, BREAK, CONTINUE,
-    BINARY, LOGICAL, UNARY,
-    LITERAL, VARIABLE, CALL,
-};
-
 struct ast_node
 {
     enum ast_type type;

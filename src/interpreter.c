@@ -40,8 +40,27 @@ struct interpreter* interpreter_init()
 
 void interpret(struct interpreter* interpreter, struct ast_list* statements)
 {
+    any value;
     for(int i = 0; i < statements->size; ++i)
-        evaluate(interpreter, ast_list_at(statements, i));
+        value = evaluate(interpreter, ast_list_at(statements, i));
+
+    switch (value.type)
+    {
+        case NUM:
+            printf("%.2f", value.num);
+            break;
+        case STRING:
+            printf("%s", value.string);
+            break;
+        case BOOL:
+            if(value.bool)
+                printf("true\n");
+            else
+                printf("false\n");
+            break;
+        default:
+            break;
+    }
 }
 
 void execute(struct interpreter* interpreter, struct ast_node* node)
@@ -132,19 +151,31 @@ static int is_equal(any first, any second)
     return 0;
 }
 
-static void validate_unary(any operand)
+static void validate_unary(enum token_type op, any operand)
 {
-    if(operand.type == NUM) return;
+    if(op == TOKEN_NOT && operand.type == BOOL) return;
+    else if(op == TOKEN_MINUS && operand.type == NUM) return;
 
-    printf("Operand must be a number.\n");
+    printf("Invalid operand in unary operation.\n");
     exit(1);
 }
 
-static void validate_binary(any left, any right)
+static void validate_binary(enum token_type op, any left, any right)
 {
-    if(left.type == NUM && right.type == NUM) return;
+    printf("op: %d\n", op);
+    if(op == TOKEN_PLUS || op == TOKEN_MINUS || op == TOKEN_DIV || op == TOKEN_MULT || op == TOKEN_MOD)
+    {
+        if(left.type == NUM && right.type == NUM) return;
+    }
+    else
+    {
+        if(left.type == BOOL && right.type == BOOL) return;
+        if(left.type == NUM && right.type == BOOL) return;
+        if(left.type == BOOL && right.type == NUM) return;
+        if(left.type == NUM && right.type == NUM) return;
+    }
 
-    printf("Operands must be a number.\n");
+    printf("Invalid operand in binary operation.\n");
     exit(1);
 }
 
@@ -324,7 +355,7 @@ any visit_unary(struct interpreter* i, struct ast_unary* node)
 {
     any right = evaluate(i, node->right);
 
-    validate_unary(right);
+    validate_unary(node->op.type, right);
     return solve_unary(node->op.type, right);
 }
 
@@ -333,7 +364,7 @@ any visit_binary(struct interpreter* i, struct ast_binary* node)
     any left = evaluate(i, node->left);
     any right = evaluate(i, node->right);
 
-    validate_binary(left, right);
+    validate_binary(node->op.type, left, right);
     return solve_binary(node->op.type, left, right);
 }
 

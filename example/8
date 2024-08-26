@@ -1,6 +1,0 @@
-fn add(a: num, b: num)
-{
-    return a + b;
-}
-
-add(2, 3);

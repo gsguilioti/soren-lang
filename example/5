@@ -1,9 +1,0 @@
-fn test(a, b)
-{
-    # comment
-    var c = 5;
-    a = 'dslka';
-    b = a;
-    true;
-    return a;
-}

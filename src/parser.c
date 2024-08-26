@@ -347,7 +347,7 @@ struct ast_node* equality_tail(struct parser* parser, struct ast_node* left)
     if(match(parser, TOKEN_EQUAL) || match(parser, TOKEN_NOTEQUAL))
     {
         struct ast_node* right = rel(parser);
-        struct ast_node* logical = ast_logical(*token, left, right);
+        struct ast_node* logical = ast_binary(*token, left, right);
         return equality_tail(parser, logical);
     }
 
@@ -369,7 +369,7 @@ struct ast_node* rel_tail(struct parser* parser, struct ast_node* left)
     || match(parser, TOKEN_LTHEN))
     {
         struct ast_node* right = expr(parser);
-        struct ast_node* logical = ast_logical(*token, left, right);
+        struct ast_node* logical = ast_binary(*token, left, right);
         return rel_tail(parser, logical);
     }
 

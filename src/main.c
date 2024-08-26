@@ -62,6 +62,13 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    char *result = strstr(argv[1], ".srn");
+    if (result == NULL)
+    {
+        printf("invalid file.\n");
+        exit(1);
+    }
     
     char filename[100];
     strcpy(filename, ".//example//");

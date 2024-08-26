@@ -30,4 +30,13 @@ enum token_type
     TOKEN_ENDLINE, TOKEN_END
 };
 
+enum ast_type
+{
+    VARDECL, FUNDECL,
+    ASSIGN, BLOCK, IF, LOOP,
+    RETURN, BREAK, CONTINUE,
+    BINARY, LOGICAL, UNARY,
+    LITERAL, VARIABLE, CALL,
+};
+
 #endif

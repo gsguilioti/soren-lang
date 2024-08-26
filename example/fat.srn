@@ -1,0 +1,11 @@
+fn fat(n: num) -> num
+{
+    if(n <= 1)
+    {
+        return 1;
+    }
+
+    return n * fat(n - 1);
+}
+
+fat(5);

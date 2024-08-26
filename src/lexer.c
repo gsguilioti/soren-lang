@@ -181,7 +181,7 @@ struct token* lexer_num(struct lexer* lexer)
     num[1] = '\0';
     lexer_advance(lexer);
     
-    while(isdigit(lexer->current))
+    while(isdigit(lexer->current) || lexer->current == '.')
     {
         char* aux = lexer_tostring_char(lexer);
         num = realloc(num, (strlen(num) + strlen(aux) + 1) * sizeof(char));
@@ -200,7 +200,7 @@ struct token* lexer_keyword(struct lexer* lexer)
     keyword[1] = '\0';
     lexer_advance(lexer);
     
-    while(isalnum(lexer->current))
+    while(isalnum(lexer->current) || lexer->current == '_')
     {
         char* aux = lexer_tostring_char(lexer);
         keyword = realloc(keyword, (strlen(keyword) + strlen(aux) + 1) * sizeof(char));
@@ -266,7 +266,10 @@ struct token* lexer_handle_minus(struct lexer* lexer)
     if(lexer->content[lexer->pos+1] == '=')
         return lexer_op(lexer, TOKEN_MINUSEQUAL, "-=");
     else if(lexer->content[lexer->pos+1] == '>')
+    {
+        lexer_advance(lexer);
         return lexer_op(lexer, TOKEN_ARROW, "->");
+    }
 
     return lexer_op(lexer, TOKEN_MINUS, lexer_tostring_char(lexer));
 }

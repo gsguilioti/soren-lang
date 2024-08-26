@@ -11,7 +11,7 @@ struct interpreter
     struct scope* global;
     struct scope* environment;
     any retval;
-    int returning; 
+    int returning;
 };
 
 struct interpreter* interpreter_init();

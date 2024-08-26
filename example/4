@@ -1,9 +1,0 @@
-fn a(b)
-{
-    if( 10 + 3)
-        continue;
-
-    var a = 0;
-    loop(a < 3)
-        a = a + 1;
-}
